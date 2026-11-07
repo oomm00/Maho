@@ -1,0 +1,19 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.omsati.dropwatch.app-mergeDebugResources-51:/values-v30/values-v30.xml",
+            "map": [
+                {
+                    "source": "C:\\Users\\omsat\\.gradle\\caches\\9.6.0\\transforms\\e53a2d45a45167c4a34fb2667f4f4779\\transformed\\material3-release\\res\\values-v30\\values-v30.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "72",
+                        "endOffsets": "123"
+                    }
+                }
+            ]
+        }
+    ]
+}

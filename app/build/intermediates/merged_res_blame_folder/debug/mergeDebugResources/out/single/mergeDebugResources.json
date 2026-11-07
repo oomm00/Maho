@@ -1,0 +1,58 @@
+[
+    {
+        "merged": "C:\\Users\\omsat\\.gradle\\daemon\\9.6.0\\com.omsati.dropwatch.app-debug-53:\\drawable_ic_notif.xml.flat",
+        "source": "C:\\Users\\omsat\\.gradle\\daemon\\9.6.0\\com.omsati.dropwatch.app-main-55:\\drawable\\ic_notif.xml"
+    },
+    {
+        "merged": "C:\\Users\\omsat\\.gradle\\daemon\\9.6.0\\com.omsati.dropwatch.app-debug-53:\\drawable_ic_fg.xml.flat",
+        "source": "C:\\Users\\omsat\\.gradle\\daemon\\9.6.0\\com.omsati.dropwatch.app-main-55:\\drawable\\ic_fg.xml"
+    },
+    {
+        "merged": "C:\\Users\\omsat\\.gradle\\daemon\\9.6.0\\com.omsati.dropwatch.app-debug-53:\\drawable_ic_view_list.xml.flat",
+        "source": "C:\\Users\\omsat\\.gradle\\daemon\\9.6.0\\com.omsati.dropwatch.app-main-55:\\drawable\\ic_view_list.xml"
+    },
+    {
+        "merged": "C:\\Users\\omsat\\.gradle\\daemon\\9.6.0\\com.omsati.dropwatch.app-debug-53:\\drawable_ic_grid_view.xml.flat",
+        "source": "C:\\Users\\omsat\\.gradle\\daemon\\9.6.0\\com.omsati.dropwatch.app-main-55:\\drawable\\ic_grid_view.xml"
+    },
+    {
+        "merged": "com.omsati.dropwatch.app-debug-53:/drawable_ic_sort.xml.flat",
+        "source": "com.omsati.dropwatch.app-main-55:/drawable/ic_sort.xml"
+    },
+    {
+        "merged": "C:\\Users\\omsat\\.gradle\\daemon\\9.6.0\\com.omsati.dropwatch.app-debug-53:\\drawable_ic_new_folder.xml.flat",
+        "source": "C:\\Users\\omsat\\.gradle\\daemon\\9.6.0\\com.omsati.dropwatch.app-main-55:\\drawable\\ic_new_folder.xml"
+    },
+    {
+        "merged": "com.omsati.dropwatch.app-debug-53:/drawable_ic_note.xml.flat",
+        "source": "com.omsati.dropwatch.app-main-55:/drawable/ic_note.xml"
+    },
+    {
+        "merged": "C:\\Users\\omsat\\.gradle\\daemon\\9.6.0\\com.omsati.dropwatch.app-debug-53:\\drawable_ic_image_error.xml.flat",
+        "source": "C:\\Users\\omsat\\.gradle\\daemon\\9.6.0\\com.omsati.dropwatch.app-main-55:\\drawable\\ic_image_error.xml"
+    },
+    {
+        "merged": "com.omsati.dropwatch.app-debug-53:/drawable_ic_drag_handle.xml.flat",
+        "source": "com.omsati.dropwatch.app-main-55:/drawable/ic_drag_handle.xml"
+    },
+    {
+        "merged": "C:\\Users\\omsat\\.gradle\\daemon\\9.6.0\\com.omsati.dropwatch.app-debug-53:\\drawable_ic_theme.xml.flat",
+        "source": "C:\\Users\\omsat\\.gradle\\daemon\\9.6.0\\com.omsati.dropwatch.app-main-55:\\drawable\\ic_theme.xml"
+    },
+    {
+        "merged": "C:\\Users\\omsat\\.gradle\\daemon\\9.6.0\\com.omsati.dropwatch.app-debug-53:\\drawable_ic_receipt.xml.flat",
+        "source": "C:\\Users\\omsat\\.gradle\\daemon\\9.6.0\\com.omsati.dropwatch.app-main-55:\\drawable\\ic_receipt.xml"
+    },
+    {
+        "merged": "C:\\Users\\omsat\\.gradle\\daemon\\9.6.0\\com.omsati.dropwatch.app-debug-53:\\xml_file_paths.xml.flat",
+        "source": "C:\\Users\\omsat\\.gradle\\daemon\\9.6.0\\com.omsati.dropwatch.app-main-55:\\xml\\file_paths.xml"
+    },
+    {
+        "merged": "C:\\Users\\omsat\\.gradle\\daemon\\9.6.0\\com.omsati.dropwatch.app-debug-53:\\drawable_ic_placeholder.xml.flat",
+        "source": "C:\\Users\\omsat\\.gradle\\daemon\\9.6.0\\com.omsati.dropwatch.app-main-55:\\drawable\\ic_placeholder.xml"
+    },
+    {
+        "merged": "C:\\Users\\omsat\\.gradle\\daemon\\9.6.0\\com.omsati.dropwatch.app-debug-53:\\mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "C:\\Users\\omsat\\.gradle\\daemon\\9.6.0\\com.omsati.dropwatch.app-main-55:\\mipmap-anydpi-v26\\ic_launcher.xml"
+    }
+]

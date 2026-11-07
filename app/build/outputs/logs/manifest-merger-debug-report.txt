@@ -1,0 +1,625 @@
+-- Merging decision tree log ---
+provider#androidx.core.content.FileProvider
+INJECTED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml:30:9-38:20
+	android:grantUriPermissions
+		ADDED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml:34:13-47
+	android:authorities
+		INJECTED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml
+		ADDED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml:32:13-64
+	android:exported
+		ADDED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml:33:13-37
+	android:name
+		ADDED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml:31:13-62
+manifest
+ADDED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml:2:1-40:12
+INJECTED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml:2:1-40:12
+INJECTED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml:2:1-40:12
+INJECTED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml:2:1-40:12
+MERGED from [androidx.activity:activity:1.9.3] C:\Users\omsat\.gradle\caches\9.6.0\transforms\03494237ab2a26f029cbb897291e4c6a\transformed\activity-1.9.3\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.work:work-runtime-ktx:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\523e0a7ac30144050d9479b8b0f2596f\transformed\work-runtime-ktx-2.9.1\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:17:1-145:12
+MERGED from [androidx.compose.material3:material3-android:1.3.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\e53a2d45a45167c4a34fb2667f4f4779\transformed\material3-release\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.savedstate:savedstate-ktx:1.2.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\a1a386efca4a3deb4ff0a7afafada62a\transformed\savedstate-ktx-1.2.1\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.savedstate:savedstate:1.2.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\ca99404ebed5e26fa08663f138b9d831\transformed\savedstate-1.2.1\AndroidManifest.xml:17:1-22:12
+MERGED from [io.coil-kt:coil-compose:2.7.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\16e4c96a9d0fafe02af7992e87da9e76\transformed\coil-compose-2.7.0\AndroidManifest.xml:2:1-7:12
+MERGED from [io.coil-kt:coil-compose-base:2.7.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\b8f286d0126082e0f3d7e2d11e2a33a8\transformed\coil-compose-base-2.7.0\AndroidManifest.xml:2:1-7:12
+MERGED from [io.coil-kt:coil:2.7.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\e2f1bf55308387cc4568072806a13dea\transformed\coil-2.7.0\AndroidManifest.xml:2:1-7:12
+MERGED from [io.coil-kt:coil-base:2.7.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\b8241a713e26f65bbc6321bc7c33be0c\transformed\coil-base-2.7.0\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.customview:customview-poolingcontainer:1.0.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\8b5b61690851a0e660da9b2aa4917180\transformed\customview-poolingcontainer-1.0.0\AndroidManifest.xml:17:1-23:12
+MERGED from [androidx.core:core-ktx:1.13.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\ef16a59dda79628bfb5edae4ceb07624\transformed\core-ktx-1.13.1\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.autofill:autofill:1.0.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\41bc73ca813abb85c0e1a923466018e1\transformed\autofill-1.0.0\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.appcompat:appcompat-resources:1.6.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\ac006249c9a5d652ed4dff2597117868\transformed\appcompat-resources-1.6.1\AndroidManifest.xml:17:1-22:12
+MERGED from [sh.calvin.reorderable:reorderable-android-debug:2.4.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\79c0ec04eec6c255e3ca468b8f6c6123\transformed\reorderable-debug\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.animation:animation-core-android:1.7.5] C:\Users\omsat\.gradle\caches\9.6.0\transforms\bedfd37ac1f81440c8447d953e11416f\transformed\animation-core-release\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.material:material-ripple-android:1.7.5] C:\Users\omsat\.gradle\caches\9.6.0\transforms\afcd340428fd52e6e2fc1076139d5e0c\transformed\material-ripple-release\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.animation:animation-android:1.7.5] C:\Users\omsat\.gradle\caches\9.6.0\transforms\2428829effcc4aba9009977ca7dc4cdf\transformed\animation-release\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.foundation:foundation-layout-android:1.7.5] C:\Users\omsat\.gradle\caches\9.6.0\transforms\1253973167b09f501608cedefc91fc41\transformed\foundation-layout-release\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.foundation:foundation-android:1.7.5] C:\Users\omsat\.gradle\caches\9.6.0\transforms\b9c35d7b79d9b606ec96a8ba24ca94a2\transformed\foundation-release\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.ui:ui-unit-android:1.7.5] C:\Users\omsat\.gradle\caches\9.6.0\transforms\760408468d9b8fa7b957b005b7fb66e2\transformed\ui-unit-release\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.ui:ui-graphics-android:1.7.5] C:\Users\omsat\.gradle\caches\9.6.0\transforms\ed54abfd12a7fd2651b1006b0cc992ae\transformed\ui-graphics-release\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.ui:ui-geometry-android:1.7.5] C:\Users\omsat\.gradle\caches\9.6.0\transforms\f6f3431d34583d1b953c424a547e396a\transformed\ui-geometry-release\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.ui:ui-util-android:1.7.5] C:\Users\omsat\.gradle\caches\9.6.0\transforms\62206b8ce9c6880cc7cabf4bebb1bfc0\transformed\ui-util-release\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.ui:ui-text-android:1.7.5] C:\Users\omsat\.gradle\caches\9.6.0\transforms\51325839ec7f1166b50f8f82b69f2151\transformed\ui-text-release\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.vectordrawable:vectordrawable-animated:1.1.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\4fa1d9fdc861171af4a777c82e3a6ad9\transformed\vectordrawable-animated-1.1.0\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.vectordrawable:vectordrawable:1.1.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\e429de97a0c909c7911559d74ef943ec\transformed\vectordrawable-1.1.0\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.emoji2:emoji2:1.3.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9d226faa1322be345e6aee8bb1bf7b7e\transformed\emoji2-1.3.0\AndroidManifest.xml:17:1-35:12
+MERGED from [androidx.graphics:graphics-path:1.0.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\d4f720dab84903346e71fa2cb55e99b4\transformed\graphics-path-1.0.1\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.core:core:1.13.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\c0a3257aacf3d2c5b0b9adb9f92ef6ca\transformed\core-1.13.1\AndroidManifest.xml:17:1-30:12
+MERGED from [androidx.lifecycle:lifecycle-process:2.8.7] C:\Users\omsat\.gradle\caches\9.6.0\transforms\8624fb591f09138f63a69110f11ff67e\transformed\lifecycle-process-2.8.7\AndroidManifest.xml:17:1-35:12
+MERGED from [androidx.lifecycle:lifecycle-runtime-compose-android:2.8.7] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9a5aed18ce4efc3f2dd8ef249df4c23e\transformed\lifecycle-runtime-compose-release\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.lifecycle:lifecycle-livedata-core-ktx:2.8.7] C:\Users\omsat\.gradle\caches\9.6.0\transforms\cb4e1de621a93ca2e80a99807f131034\transformed\lifecycle-livedata-core-ktx-2.8.7\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.lifecycle:lifecycle-runtime-android:2.8.7] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9116ce69f8c5b7fc0d863d82d2c29e32\transformed\lifecycle-runtime-release\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.8.7] C:\Users\omsat\.gradle\caches\9.6.0\transforms\669bc167400fc117683d1d1d0d3d5604\transformed\lifecycle-livedata-core-2.8.7\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-runtime-ktx-android:2.8.7] C:\Users\omsat\.gradle\caches\9.6.0\transforms\0996a2fb447700d1ac6c2acff4f2fb12\transformed\lifecycle-runtime-ktx-release\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-android:2.8.7] C:\Users\omsat\.gradle\caches\9.6.0\transforms\0b220c1a27c4ce3e37209c4c4a04503d\transformed\lifecycle-viewmodel-release\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-service:2.8.7] C:\Users\omsat\.gradle\caches\9.6.0\transforms\8876fe87a14db952b44c169f1b975879\transformed\lifecycle-service-2.8.7\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.8.7] C:\Users\omsat\.gradle\caches\9.6.0\transforms\6e7abb2f023874deb71b7dd6c191d5d0\transformed\lifecycle-livedata-2.8.7\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate:2.8.7] C:\Users\omsat\.gradle\caches\9.6.0\transforms\7d00fe5458e29f2479235b1c8eb8ce41\transformed\lifecycle-viewmodel-savedstate-2.8.7\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7] C:\Users\omsat\.gradle\caches\9.6.0\transforms\ed6469ed2b9570277022d81da289ab2e\transformed\lifecycle-viewmodel-ktx-2.8.7\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-compose-android:2.8.7] C:\Users\omsat\.gradle\caches\9.6.0\transforms\f00e43e33a9f8ec77ac96ce80e7bc74e\transformed\lifecycle-viewmodel-compose-release\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.material:material-icons-core-android:1.7.5] C:\Users\omsat\.gradle\caches\9.6.0\transforms\bc8e6d98101a9286fa35e13cd39d516e\transformed\material-icons-core-release\AndroidManifest.xml:2:1-7:12
+MERGED from [com.google.accompanist:accompanist-drawablepainter:0.32.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\04b523702c4bc5fe38d9165742967c07\transformed\accompanist-drawablepainter-0.32.0\AndroidManifest.xml:17:1-23:12
+MERGED from [androidx.compose.ui:ui-android:1.7.5] C:\Users\omsat\.gradle\caches\9.6.0\transforms\ce0e6c19b153c43cbdfe11e14e95d58a\transformed\ui-release\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.activity:activity-ktx:1.9.3] C:\Users\omsat\.gradle\caches\9.6.0\transforms\1335b7b21a783dd94cc96d1e6ef672a4\transformed\activity-ktx-1.9.3\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.activity:activity-compose:1.9.3] C:\Users\omsat\.gradle\caches\9.6.0\transforms\f76d4a280177c1cb7e7a8b5fe0024c37\transformed\activity-compose-1.9.3\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.room:room-runtime:2.6.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\713031b92689e08fbf6d0aa951c72fc5\transformed\room-runtime-2.6.1\AndroidManifest.xml:17:1-31:12
+MERGED from [androidx.room:room-ktx:2.6.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\f0809c98ba07474118b6e7456c749f27\transformed\room-ktx-2.6.1\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.sqlite:sqlite-framework:2.4.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\787fc212bad6c24e083f5416e5974acf\transformed\sqlite-framework-2.4.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.sqlite:sqlite:2.4.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\8dc66d514cfa41558d3c75ff79c7e34c\transformed\sqlite-2.4.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.compose.runtime:runtime-android:1.7.5] C:\Users\omsat\.gradle\caches\9.6.0\transforms\1ee55b6ab8b9b9ffc7ba9555b3d83e1e\transformed\runtime-release\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.runtime:runtime-saveable-android:1.7.5] C:\Users\omsat\.gradle\caches\9.6.0\transforms\6cf86edd9a9d7f1e3aa34c49c1775095\transformed\runtime-saveable-release\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.annotation:annotation-experimental:1.4.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\8d94b2aca3fa9d141cf738cd4771a63a\transformed\annotation-experimental-1.4.1\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\66bd374e51efcdada923e5a55da1f6a1\transformed\versionedparcelable-1.1.1\AndroidManifest.xml:17:1-27:12
+MERGED from [androidx.arch.core:core-runtime:2.2.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\55584f5fdba186318b0513da93cbb6f0\transformed\core-runtime-2.2.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.interpolator:interpolator:1.0.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\4ab60e404396140e2555b1ada7ac0410\transformed\interpolator-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9984e8b22e2f1fd6690f9fa6f85f0c49\transformed\profileinstaller-1.3.1\AndroidManifest.xml:17:1-55:12
+MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9a50f7ab9552c608349fb4b74e29c255\transformed\startup-runtime-1.1.1\AndroidManifest.xml:17:1-33:12
+MERGED from [androidx.tracing:tracing:1.0.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\0ca41aae9c2f347cb3a3bf2e60940e3c\transformed\tracing-1.0.0\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.exifinterface:exifinterface:1.3.7] C:\Users\omsat\.gradle\caches\9.6.0\transforms\b121e10e395a9036f9c32e2a94bf622c\transformed\exifinterface-1.3.7\AndroidManifest.xml:17:1-24:12
+	package
+		INJECTED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml
+	android:versionName
+		INJECTED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml
+	android:versionCode
+		INJECTED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml
+	xmlns:android
+		ADDED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml:2:11-69
+uses-permission#android.permission.INTERNET
+ADDED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml:3:5-67
+	android:name
+		ADDED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml:3:22-64
+uses-permission#android.permission.POST_NOTIFICATIONS
+ADDED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml:4:5-77
+	android:name
+		ADDED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml:4:22-74
+application
+ADDED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml:6:5-39:19
+INJECTED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml:6:5-39:19
+MERGED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:28:5-143:19
+MERGED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:28:5-143:19
+MERGED from [androidx.emoji2:emoji2:1.3.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9d226faa1322be345e6aee8bb1bf7b7e\transformed\emoji2-1.3.0\AndroidManifest.xml:23:5-33:19
+MERGED from [androidx.emoji2:emoji2:1.3.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9d226faa1322be345e6aee8bb1bf7b7e\transformed\emoji2-1.3.0\AndroidManifest.xml:23:5-33:19
+MERGED from [androidx.core:core:1.13.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\c0a3257aacf3d2c5b0b9adb9f92ef6ca\transformed\core-1.13.1\AndroidManifest.xml:28:5-89
+MERGED from [androidx.core:core:1.13.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\c0a3257aacf3d2c5b0b9adb9f92ef6ca\transformed\core-1.13.1\AndroidManifest.xml:28:5-89
+MERGED from [androidx.lifecycle:lifecycle-process:2.8.7] C:\Users\omsat\.gradle\caches\9.6.0\transforms\8624fb591f09138f63a69110f11ff67e\transformed\lifecycle-process-2.8.7\AndroidManifest.xml:23:5-33:19
+MERGED from [androidx.lifecycle:lifecycle-process:2.8.7] C:\Users\omsat\.gradle\caches\9.6.0\transforms\8624fb591f09138f63a69110f11ff67e\transformed\lifecycle-process-2.8.7\AndroidManifest.xml:23:5-33:19
+MERGED from [androidx.room:room-runtime:2.6.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\713031b92689e08fbf6d0aa951c72fc5\transformed\room-runtime-2.6.1\AndroidManifest.xml:23:5-29:19
+MERGED from [androidx.room:room-runtime:2.6.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\713031b92689e08fbf6d0aa951c72fc5\transformed\room-runtime-2.6.1\AndroidManifest.xml:23:5-29:19
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\66bd374e51efcdada923e5a55da1f6a1\transformed\versionedparcelable-1.1.1\AndroidManifest.xml:24:5-25:19
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\66bd374e51efcdada923e5a55da1f6a1\transformed\versionedparcelable-1.1.1\AndroidManifest.xml:24:5-25:19
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9984e8b22e2f1fd6690f9fa6f85f0c49\transformed\profileinstaller-1.3.1\AndroidManifest.xml:23:5-53:19
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9984e8b22e2f1fd6690f9fa6f85f0c49\transformed\profileinstaller-1.3.1\AndroidManifest.xml:23:5-53:19
+MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9a50f7ab9552c608349fb4b74e29c255\transformed\startup-runtime-1.1.1\AndroidManifest.xml:25:5-31:19
+MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9a50f7ab9552c608349fb4b74e29c255\transformed\startup-runtime-1.1.1\AndroidManifest.xml:25:5-31:19
+	android:extractNativeLibs
+		INJECTED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml
+	android:appComponentFactory
+		ADDED from [androidx.core:core:1.13.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\c0a3257aacf3d2c5b0b9adb9f92ef6ca\transformed\core-1.13.1\AndroidManifest.xml:28:18-86
+	android:label
+		ADDED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml:10:9-34
+	android:icon
+		ADDED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml:9:9-43
+	android:allowBackup
+		ADDED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml:8:9-36
+	android:theme
+		ADDED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml:11:9-47
+	android:usesCleartextTraffic
+		ADDED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml:12:9-45
+	android:name
+		ADDED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml:7:9-37
+activity#com.omsati.dropwatch.MainActivity
+ADDED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml:13:9-28:20
+	android:launchMode
+		ADDED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml:16:13-43
+	android:windowSoftInputMode
+		ADDED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml:17:13-55
+	android:exported
+		ADDED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml:15:13-36
+	android:name
+		ADDED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml:14:13-41
+intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
+ADDED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml:18:13-21:29
+action#android.intent.action.MAIN
+ADDED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml:19:17-69
+	android:name
+		ADDED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml:19:25-66
+category#android.intent.category.LAUNCHER
+ADDED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml:20:17-77
+	android:name
+		ADDED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml:20:27-74
+intent-filter#action:name:android.intent.action.SEND+category:name:android.intent.category.DEFAULT+data:mimeType:text/plain
+ADDED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml:23:13-27:29
+action#android.intent.action.SEND
+ADDED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml:24:17-69
+	android:name
+		ADDED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml:24:25-66
+category#android.intent.category.DEFAULT
+ADDED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml:25:17-76
+	android:name
+		ADDED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml:25:27-73
+data
+ADDED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml:26:17-55
+	android:mimeType
+		ADDED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml:26:23-52
+meta-data#android.support.FILE_PROVIDER_PATHS
+ADDED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml:35:13-37:54
+	android:resource
+		ADDED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml:37:17-51
+	android:name
+		ADDED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml:36:17-67
+uses-sdk
+INJECTED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml
+INJECTED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml
+MERGED from [androidx.activity:activity:1.9.3] C:\Users\omsat\.gradle\caches\9.6.0\transforms\03494237ab2a26f029cbb897291e4c6a\transformed\activity-1.9.3\AndroidManifest.xml:20:5-44
+MERGED from [androidx.activity:activity:1.9.3] C:\Users\omsat\.gradle\caches\9.6.0\transforms\03494237ab2a26f029cbb897291e4c6a\transformed\activity-1.9.3\AndroidManifest.xml:20:5-44
+MERGED from [androidx.work:work-runtime-ktx:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\523e0a7ac30144050d9479b8b0f2596f\transformed\work-runtime-ktx-2.9.1\AndroidManifest.xml:20:5-44
+MERGED from [androidx.work:work-runtime-ktx:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\523e0a7ac30144050d9479b8b0f2596f\transformed\work-runtime-ktx-2.9.1\AndroidManifest.xml:20:5-44
+MERGED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:21:5-44
+MERGED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:21:5-44
+MERGED from [androidx.compose.material3:material3-android:1.3.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\e53a2d45a45167c4a34fb2667f4f4779\transformed\material3-release\AndroidManifest.xml:20:5-44
+MERGED from [androidx.compose.material3:material3-android:1.3.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\e53a2d45a45167c4a34fb2667f4f4779\transformed\material3-release\AndroidManifest.xml:20:5-44
+MERGED from [androidx.savedstate:savedstate-ktx:1.2.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\a1a386efca4a3deb4ff0a7afafada62a\transformed\savedstate-ktx-1.2.1\AndroidManifest.xml:20:5-44
+MERGED from [androidx.savedstate:savedstate-ktx:1.2.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\a1a386efca4a3deb4ff0a7afafada62a\transformed\savedstate-ktx-1.2.1\AndroidManifest.xml:20:5-44
+MERGED from [androidx.savedstate:savedstate:1.2.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\ca99404ebed5e26fa08663f138b9d831\transformed\savedstate-1.2.1\AndroidManifest.xml:20:5-44
+MERGED from [androidx.savedstate:savedstate:1.2.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\ca99404ebed5e26fa08663f138b9d831\transformed\savedstate-1.2.1\AndroidManifest.xml:20:5-44
+MERGED from [io.coil-kt:coil-compose:2.7.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\16e4c96a9d0fafe02af7992e87da9e76\transformed\coil-compose-2.7.0\AndroidManifest.xml:5:5-44
+MERGED from [io.coil-kt:coil-compose:2.7.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\16e4c96a9d0fafe02af7992e87da9e76\transformed\coil-compose-2.7.0\AndroidManifest.xml:5:5-44
+MERGED from [io.coil-kt:coil-compose-base:2.7.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\b8f286d0126082e0f3d7e2d11e2a33a8\transformed\coil-compose-base-2.7.0\AndroidManifest.xml:5:5-44
+MERGED from [io.coil-kt:coil-compose-base:2.7.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\b8f286d0126082e0f3d7e2d11e2a33a8\transformed\coil-compose-base-2.7.0\AndroidManifest.xml:5:5-44
+MERGED from [io.coil-kt:coil:2.7.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\e2f1bf55308387cc4568072806a13dea\transformed\coil-2.7.0\AndroidManifest.xml:5:5-44
+MERGED from [io.coil-kt:coil:2.7.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\e2f1bf55308387cc4568072806a13dea\transformed\coil-2.7.0\AndroidManifest.xml:5:5-44
+MERGED from [io.coil-kt:coil-base:2.7.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\b8241a713e26f65bbc6321bc7c33be0c\transformed\coil-base-2.7.0\AndroidManifest.xml:5:5-44
+MERGED from [io.coil-kt:coil-base:2.7.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\b8241a713e26f65bbc6321bc7c33be0c\transformed\coil-base-2.7.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.customview:customview-poolingcontainer:1.0.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\8b5b61690851a0e660da9b2aa4917180\transformed\customview-poolingcontainer-1.0.0\AndroidManifest.xml:20:5-21:38
+MERGED from [androidx.customview:customview-poolingcontainer:1.0.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\8b5b61690851a0e660da9b2aa4917180\transformed\customview-poolingcontainer-1.0.0\AndroidManifest.xml:20:5-21:38
+MERGED from [androidx.core:core-ktx:1.13.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\ef16a59dda79628bfb5edae4ceb07624\transformed\core-ktx-1.13.1\AndroidManifest.xml:5:5-44
+MERGED from [androidx.core:core-ktx:1.13.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\ef16a59dda79628bfb5edae4ceb07624\transformed\core-ktx-1.13.1\AndroidManifest.xml:5:5-44
+MERGED from [androidx.autofill:autofill:1.0.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\41bc73ca813abb85c0e1a923466018e1\transformed\autofill-1.0.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.autofill:autofill:1.0.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\41bc73ca813abb85c0e1a923466018e1\transformed\autofill-1.0.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.appcompat:appcompat-resources:1.6.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\ac006249c9a5d652ed4dff2597117868\transformed\appcompat-resources-1.6.1\AndroidManifest.xml:20:5-44
+MERGED from [androidx.appcompat:appcompat-resources:1.6.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\ac006249c9a5d652ed4dff2597117868\transformed\appcompat-resources-1.6.1\AndroidManifest.xml:20:5-44
+MERGED from [sh.calvin.reorderable:reorderable-android-debug:2.4.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\79c0ec04eec6c255e3ca468b8f6c6123\transformed\reorderable-debug\AndroidManifest.xml:5:5-44
+MERGED from [sh.calvin.reorderable:reorderable-android-debug:2.4.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\79c0ec04eec6c255e3ca468b8f6c6123\transformed\reorderable-debug\AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.animation:animation-core-android:1.7.5] C:\Users\omsat\.gradle\caches\9.6.0\transforms\bedfd37ac1f81440c8447d953e11416f\transformed\animation-core-release\AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.animation:animation-core-android:1.7.5] C:\Users\omsat\.gradle\caches\9.6.0\transforms\bedfd37ac1f81440c8447d953e11416f\transformed\animation-core-release\AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.material:material-ripple-android:1.7.5] C:\Users\omsat\.gradle\caches\9.6.0\transforms\afcd340428fd52e6e2fc1076139d5e0c\transformed\material-ripple-release\AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.material:material-ripple-android:1.7.5] C:\Users\omsat\.gradle\caches\9.6.0\transforms\afcd340428fd52e6e2fc1076139d5e0c\transformed\material-ripple-release\AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.animation:animation-android:1.7.5] C:\Users\omsat\.gradle\caches\9.6.0\transforms\2428829effcc4aba9009977ca7dc4cdf\transformed\animation-release\AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.animation:animation-android:1.7.5] C:\Users\omsat\.gradle\caches\9.6.0\transforms\2428829effcc4aba9009977ca7dc4cdf\transformed\animation-release\AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.foundation:foundation-layout-android:1.7.5] C:\Users\omsat\.gradle\caches\9.6.0\transforms\1253973167b09f501608cedefc91fc41\transformed\foundation-layout-release\AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.foundation:foundation-layout-android:1.7.5] C:\Users\omsat\.gradle\caches\9.6.0\transforms\1253973167b09f501608cedefc91fc41\transformed\foundation-layout-release\AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.foundation:foundation-android:1.7.5] C:\Users\omsat\.gradle\caches\9.6.0\transforms\b9c35d7b79d9b606ec96a8ba24ca94a2\transformed\foundation-release\AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.foundation:foundation-android:1.7.5] C:\Users\omsat\.gradle\caches\9.6.0\transforms\b9c35d7b79d9b606ec96a8ba24ca94a2\transformed\foundation-release\AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-unit-android:1.7.5] C:\Users\omsat\.gradle\caches\9.6.0\transforms\760408468d9b8fa7b957b005b7fb66e2\transformed\ui-unit-release\AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-unit-android:1.7.5] C:\Users\omsat\.gradle\caches\9.6.0\transforms\760408468d9b8fa7b957b005b7fb66e2\transformed\ui-unit-release\AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-graphics-android:1.7.5] C:\Users\omsat\.gradle\caches\9.6.0\transforms\ed54abfd12a7fd2651b1006b0cc992ae\transformed\ui-graphics-release\AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-graphics-android:1.7.5] C:\Users\omsat\.gradle\caches\9.6.0\transforms\ed54abfd12a7fd2651b1006b0cc992ae\transformed\ui-graphics-release\AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-geometry-android:1.7.5] C:\Users\omsat\.gradle\caches\9.6.0\transforms\f6f3431d34583d1b953c424a547e396a\transformed\ui-geometry-release\AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-geometry-android:1.7.5] C:\Users\omsat\.gradle\caches\9.6.0\transforms\f6f3431d34583d1b953c424a547e396a\transformed\ui-geometry-release\AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-util-android:1.7.5] C:\Users\omsat\.gradle\caches\9.6.0\transforms\62206b8ce9c6880cc7cabf4bebb1bfc0\transformed\ui-util-release\AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-util-android:1.7.5] C:\Users\omsat\.gradle\caches\9.6.0\transforms\62206b8ce9c6880cc7cabf4bebb1bfc0\transformed\ui-util-release\AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-text-android:1.7.5] C:\Users\omsat\.gradle\caches\9.6.0\transforms\51325839ec7f1166b50f8f82b69f2151\transformed\ui-text-release\AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-text-android:1.7.5] C:\Users\omsat\.gradle\caches\9.6.0\transforms\51325839ec7f1166b50f8f82b69f2151\transformed\ui-text-release\AndroidManifest.xml:5:5-44
+MERGED from [androidx.vectordrawable:vectordrawable-animated:1.1.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\4fa1d9fdc861171af4a777c82e3a6ad9\transformed\vectordrawable-animated-1.1.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.vectordrawable:vectordrawable-animated:1.1.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\4fa1d9fdc861171af4a777c82e3a6ad9\transformed\vectordrawable-animated-1.1.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.vectordrawable:vectordrawable:1.1.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\e429de97a0c909c7911559d74ef943ec\transformed\vectordrawable-1.1.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.vectordrawable:vectordrawable:1.1.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\e429de97a0c909c7911559d74ef943ec\transformed\vectordrawable-1.1.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.emoji2:emoji2:1.3.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9d226faa1322be345e6aee8bb1bf7b7e\transformed\emoji2-1.3.0\AndroidManifest.xml:21:5-44
+MERGED from [androidx.emoji2:emoji2:1.3.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9d226faa1322be345e6aee8bb1bf7b7e\transformed\emoji2-1.3.0\AndroidManifest.xml:21:5-44
+MERGED from [androidx.graphics:graphics-path:1.0.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\d4f720dab84903346e71fa2cb55e99b4\transformed\graphics-path-1.0.1\AndroidManifest.xml:5:5-44
+MERGED from [androidx.graphics:graphics-path:1.0.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\d4f720dab84903346e71fa2cb55e99b4\transformed\graphics-path-1.0.1\AndroidManifest.xml:5:5-44
+MERGED from [androidx.core:core:1.13.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\c0a3257aacf3d2c5b0b9adb9f92ef6ca\transformed\core-1.13.1\AndroidManifest.xml:20:5-44
+MERGED from [androidx.core:core:1.13.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\c0a3257aacf3d2c5b0b9adb9f92ef6ca\transformed\core-1.13.1\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-process:2.8.7] C:\Users\omsat\.gradle\caches\9.6.0\transforms\8624fb591f09138f63a69110f11ff67e\transformed\lifecycle-process-2.8.7\AndroidManifest.xml:21:5-44
+MERGED from [androidx.lifecycle:lifecycle-process:2.8.7] C:\Users\omsat\.gradle\caches\9.6.0\transforms\8624fb591f09138f63a69110f11ff67e\transformed\lifecycle-process-2.8.7\AndroidManifest.xml:21:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime-compose-android:2.8.7] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9a5aed18ce4efc3f2dd8ef249df4c23e\transformed\lifecycle-runtime-compose-release\AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime-compose-android:2.8.7] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9a5aed18ce4efc3f2dd8ef249df4c23e\transformed\lifecycle-runtime-compose-release\AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core-ktx:2.8.7] C:\Users\omsat\.gradle\caches\9.6.0\transforms\cb4e1de621a93ca2e80a99807f131034\transformed\lifecycle-livedata-core-ktx-2.8.7\AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core-ktx:2.8.7] C:\Users\omsat\.gradle\caches\9.6.0\transforms\cb4e1de621a93ca2e80a99807f131034\transformed\lifecycle-livedata-core-ktx-2.8.7\AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime-android:2.8.7] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9116ce69f8c5b7fc0d863d82d2c29e32\transformed\lifecycle-runtime-release\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime-android:2.8.7] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9116ce69f8c5b7fc0d863d82d2c29e32\transformed\lifecycle-runtime-release\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.8.7] C:\Users\omsat\.gradle\caches\9.6.0\transforms\669bc167400fc117683d1d1d0d3d5604\transformed\lifecycle-livedata-core-2.8.7\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.8.7] C:\Users\omsat\.gradle\caches\9.6.0\transforms\669bc167400fc117683d1d1d0d3d5604\transformed\lifecycle-livedata-core-2.8.7\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime-ktx-android:2.8.7] C:\Users\omsat\.gradle\caches\9.6.0\transforms\0996a2fb447700d1ac6c2acff4f2fb12\transformed\lifecycle-runtime-ktx-release\AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime-ktx-android:2.8.7] C:\Users\omsat\.gradle\caches\9.6.0\transforms\0996a2fb447700d1ac6c2acff4f2fb12\transformed\lifecycle-runtime-ktx-release\AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-android:2.8.7] C:\Users\omsat\.gradle\caches\9.6.0\transforms\0b220c1a27c4ce3e37209c4c4a04503d\transformed\lifecycle-viewmodel-release\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-android:2.8.7] C:\Users\omsat\.gradle\caches\9.6.0\transforms\0b220c1a27c4ce3e37209c4c4a04503d\transformed\lifecycle-viewmodel-release\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-service:2.8.7] C:\Users\omsat\.gradle\caches\9.6.0\transforms\8876fe87a14db952b44c169f1b975879\transformed\lifecycle-service-2.8.7\AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-service:2.8.7] C:\Users\omsat\.gradle\caches\9.6.0\transforms\8876fe87a14db952b44c169f1b975879\transformed\lifecycle-service-2.8.7\AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.8.7] C:\Users\omsat\.gradle\caches\9.6.0\transforms\6e7abb2f023874deb71b7dd6c191d5d0\transformed\lifecycle-livedata-2.8.7\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.8.7] C:\Users\omsat\.gradle\caches\9.6.0\transforms\6e7abb2f023874deb71b7dd6c191d5d0\transformed\lifecycle-livedata-2.8.7\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate:2.8.7] C:\Users\omsat\.gradle\caches\9.6.0\transforms\7d00fe5458e29f2479235b1c8eb8ce41\transformed\lifecycle-viewmodel-savedstate-2.8.7\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate:2.8.7] C:\Users\omsat\.gradle\caches\9.6.0\transforms\7d00fe5458e29f2479235b1c8eb8ce41\transformed\lifecycle-viewmodel-savedstate-2.8.7\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7] C:\Users\omsat\.gradle\caches\9.6.0\transforms\ed6469ed2b9570277022d81da289ab2e\transformed\lifecycle-viewmodel-ktx-2.8.7\AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7] C:\Users\omsat\.gradle\caches\9.6.0\transforms\ed6469ed2b9570277022d81da289ab2e\transformed\lifecycle-viewmodel-ktx-2.8.7\AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-compose-android:2.8.7] C:\Users\omsat\.gradle\caches\9.6.0\transforms\f00e43e33a9f8ec77ac96ce80e7bc74e\transformed\lifecycle-viewmodel-compose-release\AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-compose-android:2.8.7] C:\Users\omsat\.gradle\caches\9.6.0\transforms\f00e43e33a9f8ec77ac96ce80e7bc74e\transformed\lifecycle-viewmodel-compose-release\AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.material:material-icons-core-android:1.7.5] C:\Users\omsat\.gradle\caches\9.6.0\transforms\bc8e6d98101a9286fa35e13cd39d516e\transformed\material-icons-core-release\AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.material:material-icons-core-android:1.7.5] C:\Users\omsat\.gradle\caches\9.6.0\transforms\bc8e6d98101a9286fa35e13cd39d516e\transformed\material-icons-core-release\AndroidManifest.xml:5:5-44
+MERGED from [com.google.accompanist:accompanist-drawablepainter:0.32.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\04b523702c4bc5fe38d9165742967c07\transformed\accompanist-drawablepainter-0.32.0\AndroidManifest.xml:21:5-44
+MERGED from [com.google.accompanist:accompanist-drawablepainter:0.32.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\04b523702c4bc5fe38d9165742967c07\transformed\accompanist-drawablepainter-0.32.0\AndroidManifest.xml:21:5-44
+MERGED from [androidx.compose.ui:ui-android:1.7.5] C:\Users\omsat\.gradle\caches\9.6.0\transforms\ce0e6c19b153c43cbdfe11e14e95d58a\transformed\ui-release\AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-android:1.7.5] C:\Users\omsat\.gradle\caches\9.6.0\transforms\ce0e6c19b153c43cbdfe11e14e95d58a\transformed\ui-release\AndroidManifest.xml:5:5-44
+MERGED from [androidx.activity:activity-ktx:1.9.3] C:\Users\omsat\.gradle\caches\9.6.0\transforms\1335b7b21a783dd94cc96d1e6ef672a4\transformed\activity-ktx-1.9.3\AndroidManifest.xml:5:5-44
+MERGED from [androidx.activity:activity-ktx:1.9.3] C:\Users\omsat\.gradle\caches\9.6.0\transforms\1335b7b21a783dd94cc96d1e6ef672a4\transformed\activity-ktx-1.9.3\AndroidManifest.xml:5:5-44
+MERGED from [androidx.activity:activity-compose:1.9.3] C:\Users\omsat\.gradle\caches\9.6.0\transforms\f76d4a280177c1cb7e7a8b5fe0024c37\transformed\activity-compose-1.9.3\AndroidManifest.xml:5:5-44
+MERGED from [androidx.activity:activity-compose:1.9.3] C:\Users\omsat\.gradle\caches\9.6.0\transforms\f76d4a280177c1cb7e7a8b5fe0024c37\transformed\activity-compose-1.9.3\AndroidManifest.xml:5:5-44
+MERGED from [androidx.room:room-runtime:2.6.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\713031b92689e08fbf6d0aa951c72fc5\transformed\room-runtime-2.6.1\AndroidManifest.xml:21:5-44
+MERGED from [androidx.room:room-runtime:2.6.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\713031b92689e08fbf6d0aa951c72fc5\transformed\room-runtime-2.6.1\AndroidManifest.xml:21:5-44
+MERGED from [androidx.room:room-ktx:2.6.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\f0809c98ba07474118b6e7456c749f27\transformed\room-ktx-2.6.1\AndroidManifest.xml:20:5-44
+MERGED from [androidx.room:room-ktx:2.6.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\f0809c98ba07474118b6e7456c749f27\transformed\room-ktx-2.6.1\AndroidManifest.xml:20:5-44
+MERGED from [androidx.sqlite:sqlite-framework:2.4.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\787fc212bad6c24e083f5416e5974acf\transformed\sqlite-framework-2.4.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.sqlite:sqlite-framework:2.4.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\787fc212bad6c24e083f5416e5974acf\transformed\sqlite-framework-2.4.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.sqlite:sqlite:2.4.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\8dc66d514cfa41558d3c75ff79c7e34c\transformed\sqlite-2.4.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.sqlite:sqlite:2.4.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\8dc66d514cfa41558d3c75ff79c7e34c\transformed\sqlite-2.4.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.compose.runtime:runtime-android:1.7.5] C:\Users\omsat\.gradle\caches\9.6.0\transforms\1ee55b6ab8b9b9ffc7ba9555b3d83e1e\transformed\runtime-release\AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.runtime:runtime-android:1.7.5] C:\Users\omsat\.gradle\caches\9.6.0\transforms\1ee55b6ab8b9b9ffc7ba9555b3d83e1e\transformed\runtime-release\AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.runtime:runtime-saveable-android:1.7.5] C:\Users\omsat\.gradle\caches\9.6.0\transforms\6cf86edd9a9d7f1e3aa34c49c1775095\transformed\runtime-saveable-release\AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.runtime:runtime-saveable-android:1.7.5] C:\Users\omsat\.gradle\caches\9.6.0\transforms\6cf86edd9a9d7f1e3aa34c49c1775095\transformed\runtime-saveable-release\AndroidManifest.xml:5:5-44
+MERGED from [androidx.annotation:annotation-experimental:1.4.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\8d94b2aca3fa9d141cf738cd4771a63a\transformed\annotation-experimental-1.4.1\AndroidManifest.xml:5:5-44
+MERGED from [androidx.annotation:annotation-experimental:1.4.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\8d94b2aca3fa9d141cf738cd4771a63a\transformed\annotation-experimental-1.4.1\AndroidManifest.xml:5:5-44
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\66bd374e51efcdada923e5a55da1f6a1\transformed\versionedparcelable-1.1.1\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\66bd374e51efcdada923e5a55da1f6a1\transformed\versionedparcelable-1.1.1\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.arch.core:core-runtime:2.2.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\55584f5fdba186318b0513da93cbb6f0\transformed\core-runtime-2.2.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.arch.core:core-runtime:2.2.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\55584f5fdba186318b0513da93cbb6f0\transformed\core-runtime-2.2.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.interpolator:interpolator:1.0.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\4ab60e404396140e2555b1ada7ac0410\transformed\interpolator-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.interpolator:interpolator:1.0.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\4ab60e404396140e2555b1ada7ac0410\transformed\interpolator-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9984e8b22e2f1fd6690f9fa6f85f0c49\transformed\profileinstaller-1.3.1\AndroidManifest.xml:21:5-44
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9984e8b22e2f1fd6690f9fa6f85f0c49\transformed\profileinstaller-1.3.1\AndroidManifest.xml:21:5-44
+MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9a50f7ab9552c608349fb4b74e29c255\transformed\startup-runtime-1.1.1\AndroidManifest.xml:21:5-23:41
+MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9a50f7ab9552c608349fb4b74e29c255\transformed\startup-runtime-1.1.1\AndroidManifest.xml:21:5-23:41
+MERGED from [androidx.tracing:tracing:1.0.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\0ca41aae9c2f347cb3a3bf2e60940e3c\transformed\tracing-1.0.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.tracing:tracing:1.0.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\0ca41aae9c2f347cb3a3bf2e60940e3c\transformed\tracing-1.0.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.exifinterface:exifinterface:1.3.7] C:\Users\omsat\.gradle\caches\9.6.0\transforms\b121e10e395a9036f9c32e2a94bf622c\transformed\exifinterface-1.3.7\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.exifinterface:exifinterface:1.3.7] C:\Users\omsat\.gradle\caches\9.6.0\transforms\b121e10e395a9036f9c32e2a94bf622c\transformed\exifinterface-1.3.7\AndroidManifest.xml:20:5-22:41
+	android:targetSdkVersion
+		INJECTED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from D:\Downloads\dropwatch\dropwatch\app\src\main\AndroidManifest.xml
+uses-permission#android.permission.WAKE_LOCK
+ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:23:5-68
+	android:name
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:23:22-65
+uses-permission#android.permission.ACCESS_NETWORK_STATE
+ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:24:5-79
+	android:name
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:24:22-76
+uses-permission#android.permission.RECEIVE_BOOT_COMPLETED
+ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:25:5-81
+	android:name
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:25:22-78
+uses-permission#android.permission.FOREGROUND_SERVICE
+ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:26:5-77
+	android:name
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:26:22-74
+provider#androidx.startup.InitializationProvider
+ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:29:9-37:20
+MERGED from [androidx.emoji2:emoji2:1.3.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9d226faa1322be345e6aee8bb1bf7b7e\transformed\emoji2-1.3.0\AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.emoji2:emoji2:1.3.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9d226faa1322be345e6aee8bb1bf7b7e\transformed\emoji2-1.3.0\AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.lifecycle:lifecycle-process:2.8.7] C:\Users\omsat\.gradle\caches\9.6.0\transforms\8624fb591f09138f63a69110f11ff67e\transformed\lifecycle-process-2.8.7\AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.lifecycle:lifecycle-process:2.8.7] C:\Users\omsat\.gradle\caches\9.6.0\transforms\8624fb591f09138f63a69110f11ff67e\transformed\lifecycle-process-2.8.7\AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9984e8b22e2f1fd6690f9fa6f85f0c49\transformed\profileinstaller-1.3.1\AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9984e8b22e2f1fd6690f9fa6f85f0c49\transformed\profileinstaller-1.3.1\AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9a50f7ab9552c608349fb4b74e29c255\transformed\startup-runtime-1.1.1\AndroidManifest.xml:26:9-30:34
+MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9a50f7ab9552c608349fb4b74e29c255\transformed\startup-runtime-1.1.1\AndroidManifest.xml:26:9-30:34
+	tools:node
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:33:13-31
+	android:authorities
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:31:13-68
+	android:exported
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:32:13-37
+	android:name
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:30:13-67
+meta-data#androidx.work.WorkManagerInitializer
+ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:34:13-36:52
+	android:value
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:36:17-49
+	android:name
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:35:17-68
+service#androidx.work.impl.background.systemalarm.SystemAlarmService
+ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:39:9-45:35
+	android:enabled
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:42:13-72
+	android:exported
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:43:13-37
+	tools:ignore
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:44:13-60
+	tools:targetApi
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:45:13-32
+	android:directBootAware
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:41:13-44
+	android:name
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:40:13-88
+service#androidx.work.impl.background.systemjob.SystemJobService
+ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:46:9-52:35
+	android:enabled
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:49:13-70
+	android:exported
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:50:13-36
+	android:permission
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:51:13-69
+	tools:targetApi
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:52:13-32
+	android:directBootAware
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:48:13-44
+	android:name
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:47:13-84
+service#androidx.work.impl.foreground.SystemForegroundService
+ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:53:9-59:35
+	android:enabled
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:56:13-77
+	android:exported
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:57:13-37
+	tools:ignore
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:58:13-60
+	tools:targetApi
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:59:13-32
+	android:directBootAware
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:55:13-44
+	android:name
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:54:13-81
+receiver#androidx.work.impl.utils.ForceStopRunnable$BroadcastReceiver
+ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:61:9-66:35
+	android:enabled
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:64:13-35
+	android:exported
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:65:13-37
+	tools:targetApi
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:66:13-32
+	android:directBootAware
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:63:13-44
+	android:name
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:62:13-88
+receiver#androidx.work.impl.background.systemalarm.ConstraintProxy$BatteryChargingProxy
+ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:67:9-77:20
+	android:enabled
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:70:13-36
+	android:exported
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:71:13-37
+	tools:targetApi
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:72:13-32
+	android:directBootAware
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:69:13-44
+	android:name
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:68:13-106
+intent-filter#action:name:android.intent.action.ACTION_POWER_CONNECTED+action:name:android.intent.action.ACTION_POWER_DISCONNECTED
+ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:73:13-76:29
+action#android.intent.action.ACTION_POWER_CONNECTED
+ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:74:17-87
+	android:name
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:74:25-84
+action#android.intent.action.ACTION_POWER_DISCONNECTED
+ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:75:17-90
+	android:name
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:75:25-87
+receiver#androidx.work.impl.background.systemalarm.ConstraintProxy$BatteryNotLowProxy
+ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:78:9-88:20
+	android:enabled
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:81:13-36
+	android:exported
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:82:13-37
+	tools:targetApi
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:83:13-32
+	android:directBootAware
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:80:13-44
+	android:name
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:79:13-104
+intent-filter#action:name:android.intent.action.BATTERY_LOW+action:name:android.intent.action.BATTERY_OKAY
+ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:84:13-87:29
+action#android.intent.action.BATTERY_OKAY
+ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:85:17-77
+	android:name
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:85:25-74
+action#android.intent.action.BATTERY_LOW
+ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:86:17-76
+	android:name
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:86:25-73
+receiver#androidx.work.impl.background.systemalarm.ConstraintProxy$StorageNotLowProxy
+ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:89:9-99:20
+	android:enabled
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:92:13-36
+	android:exported
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:93:13-37
+	tools:targetApi
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:94:13-32
+	android:directBootAware
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:91:13-44
+	android:name
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:90:13-104
+intent-filter#action:name:android.intent.action.DEVICE_STORAGE_LOW+action:name:android.intent.action.DEVICE_STORAGE_OK
+ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:95:13-98:29
+action#android.intent.action.DEVICE_STORAGE_LOW
+ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:96:17-83
+	android:name
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:96:25-80
+action#android.intent.action.DEVICE_STORAGE_OK
+ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:97:17-82
+	android:name
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:97:25-79
+receiver#androidx.work.impl.background.systemalarm.ConstraintProxy$NetworkStateProxy
+ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:100:9-109:20
+	android:enabled
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:103:13-36
+	android:exported
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:104:13-37
+	tools:targetApi
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:105:13-32
+	android:directBootAware
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:102:13-44
+	android:name
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:101:13-103
+intent-filter#action:name:android.net.conn.CONNECTIVITY_CHANGE
+ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:106:13-108:29
+action#android.net.conn.CONNECTIVITY_CHANGE
+ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:107:17-79
+	android:name
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:107:25-76
+receiver#androidx.work.impl.background.systemalarm.RescheduleReceiver
+ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:110:9-121:20
+	android:enabled
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:113:13-36
+	android:exported
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:114:13-37
+	tools:targetApi
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:115:13-32
+	android:directBootAware
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:112:13-44
+	android:name
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:111:13-88
+intent-filter#action:name:android.intent.action.BOOT_COMPLETED+action:name:android.intent.action.TIMEZONE_CHANGED+action:name:android.intent.action.TIME_SET
+ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:116:13-120:29
+action#android.intent.action.BOOT_COMPLETED
+ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:117:17-79
+	android:name
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:117:25-76
+action#android.intent.action.TIME_SET
+ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:118:17-73
+	android:name
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:118:25-70
+action#android.intent.action.TIMEZONE_CHANGED
+ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:119:17-81
+	android:name
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:119:25-78
+receiver#androidx.work.impl.background.systemalarm.ConstraintProxyUpdateReceiver
+ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:122:9-131:20
+	android:enabled
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:125:13-72
+	android:exported
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:126:13-37
+	tools:targetApi
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:127:13-32
+	android:directBootAware
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:124:13-44
+	android:name
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:123:13-99
+intent-filter#action:name:androidx.work.impl.background.systemalarm.UpdateProxies
+ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:128:13-130:29
+action#androidx.work.impl.background.systemalarm.UpdateProxies
+ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:129:17-98
+	android:name
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:129:25-95
+receiver#androidx.work.impl.diagnostics.DiagnosticsReceiver
+ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:132:9-142:20
+	android:enabled
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:135:13-35
+	android:exported
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:136:13-36
+	android:permission
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:137:13-57
+	tools:targetApi
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:138:13-32
+	android:directBootAware
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:134:13-44
+	android:name
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:133:13-78
+intent-filter#action:name:androidx.work.diagnostics.REQUEST_DIAGNOSTICS
+ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:139:13-141:29
+action#androidx.work.diagnostics.REQUEST_DIAGNOSTICS
+ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:140:17-88
+	android:name
+		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\281348248b6881f42f06da39f9b3d383\transformed\work-runtime-2.9.1\AndroidManifest.xml:140:25-85
+meta-data#androidx.emoji2.text.EmojiCompatInitializer
+ADDED from [androidx.emoji2:emoji2:1.3.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9d226faa1322be345e6aee8bb1bf7b7e\transformed\emoji2-1.3.0\AndroidManifest.xml:29:13-31:52
+	android:value
+		ADDED from [androidx.emoji2:emoji2:1.3.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9d226faa1322be345e6aee8bb1bf7b7e\transformed\emoji2-1.3.0\AndroidManifest.xml:31:17-49
+	android:name
+		ADDED from [androidx.emoji2:emoji2:1.3.0] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9d226faa1322be345e6aee8bb1bf7b7e\transformed\emoji2-1.3.0\AndroidManifest.xml:30:17-75
+permission#${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.13.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\c0a3257aacf3d2c5b0b9adb9f92ef6ca\transformed\core-1.13.1\AndroidManifest.xml:22:5-24:47
+	android:protectionLevel
+		ADDED from [androidx.core:core:1.13.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\c0a3257aacf3d2c5b0b9adb9f92ef6ca\transformed\core-1.13.1\AndroidManifest.xml:24:9-44
+	android:name
+		ADDED from [androidx.core:core:1.13.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\c0a3257aacf3d2c5b0b9adb9f92ef6ca\transformed\core-1.13.1\AndroidManifest.xml:23:9-81
+permission#com.omsati.dropwatch.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.13.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\c0a3257aacf3d2c5b0b9adb9f92ef6ca\transformed\core-1.13.1\AndroidManifest.xml:22:5-24:47
+	android:protectionLevel
+		ADDED from [androidx.core:core:1.13.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\c0a3257aacf3d2c5b0b9adb9f92ef6ca\transformed\core-1.13.1\AndroidManifest.xml:24:9-44
+	android:name
+		ADDED from [androidx.core:core:1.13.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\c0a3257aacf3d2c5b0b9adb9f92ef6ca\transformed\core-1.13.1\AndroidManifest.xml:23:9-81
+uses-permission#${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.13.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\c0a3257aacf3d2c5b0b9adb9f92ef6ca\transformed\core-1.13.1\AndroidManifest.xml:26:5-97
+	android:name
+		ADDED from [androidx.core:core:1.13.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\c0a3257aacf3d2c5b0b9adb9f92ef6ca\transformed\core-1.13.1\AndroidManifest.xml:26:22-94
+uses-permission#com.omsati.dropwatch.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.13.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\c0a3257aacf3d2c5b0b9adb9f92ef6ca\transformed\core-1.13.1\AndroidManifest.xml:26:5-97
+	android:name
+		ADDED from [androidx.core:core:1.13.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\c0a3257aacf3d2c5b0b9adb9f92ef6ca\transformed\core-1.13.1\AndroidManifest.xml:26:22-94
+meta-data#androidx.lifecycle.ProcessLifecycleInitializer
+ADDED from [androidx.lifecycle:lifecycle-process:2.8.7] C:\Users\omsat\.gradle\caches\9.6.0\transforms\8624fb591f09138f63a69110f11ff67e\transformed\lifecycle-process-2.8.7\AndroidManifest.xml:29:13-31:52
+	android:value
+		ADDED from [androidx.lifecycle:lifecycle-process:2.8.7] C:\Users\omsat\.gradle\caches\9.6.0\transforms\8624fb591f09138f63a69110f11ff67e\transformed\lifecycle-process-2.8.7\AndroidManifest.xml:31:17-49
+	android:name
+		ADDED from [androidx.lifecycle:lifecycle-process:2.8.7] C:\Users\omsat\.gradle\caches\9.6.0\transforms\8624fb591f09138f63a69110f11ff67e\transformed\lifecycle-process-2.8.7\AndroidManifest.xml:30:17-78
+service#androidx.room.MultiInstanceInvalidationService
+ADDED from [androidx.room:room-runtime:2.6.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\713031b92689e08fbf6d0aa951c72fc5\transformed\room-runtime-2.6.1\AndroidManifest.xml:24:9-28:63
+	android:exported
+		ADDED from [androidx.room:room-runtime:2.6.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\713031b92689e08fbf6d0aa951c72fc5\transformed\room-runtime-2.6.1\AndroidManifest.xml:27:13-37
+	tools:ignore
+		ADDED from [androidx.room:room-runtime:2.6.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\713031b92689e08fbf6d0aa951c72fc5\transformed\room-runtime-2.6.1\AndroidManifest.xml:28:13-60
+	android:directBootAware
+		ADDED from [androidx.room:room-runtime:2.6.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\713031b92689e08fbf6d0aa951c72fc5\transformed\room-runtime-2.6.1\AndroidManifest.xml:26:13-43
+	android:name
+		ADDED from [androidx.room:room-runtime:2.6.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\713031b92689e08fbf6d0aa951c72fc5\transformed\room-runtime-2.6.1\AndroidManifest.xml:25:13-74
+meta-data#androidx.profileinstaller.ProfileInstallerInitializer
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9984e8b22e2f1fd6690f9fa6f85f0c49\transformed\profileinstaller-1.3.1\AndroidManifest.xml:29:13-31:52
+	android:value
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9984e8b22e2f1fd6690f9fa6f85f0c49\transformed\profileinstaller-1.3.1\AndroidManifest.xml:31:17-49
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9984e8b22e2f1fd6690f9fa6f85f0c49\transformed\profileinstaller-1.3.1\AndroidManifest.xml:30:17-85
+receiver#androidx.profileinstaller.ProfileInstallReceiver
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9984e8b22e2f1fd6690f9fa6f85f0c49\transformed\profileinstaller-1.3.1\AndroidManifest.xml:34:9-52:20
+	android:enabled
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9984e8b22e2f1fd6690f9fa6f85f0c49\transformed\profileinstaller-1.3.1\AndroidManifest.xml:37:13-35
+	android:exported
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9984e8b22e2f1fd6690f9fa6f85f0c49\transformed\profileinstaller-1.3.1\AndroidManifest.xml:38:13-36
+	android:permission
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9984e8b22e2f1fd6690f9fa6f85f0c49\transformed\profileinstaller-1.3.1\AndroidManifest.xml:39:13-57
+	android:directBootAware
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9984e8b22e2f1fd6690f9fa6f85f0c49\transformed\profileinstaller-1.3.1\AndroidManifest.xml:36:13-44
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9984e8b22e2f1fd6690f9fa6f85f0c49\transformed\profileinstaller-1.3.1\AndroidManifest.xml:35:13-76
+intent-filter#action:name:androidx.profileinstaller.action.INSTALL_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9984e8b22e2f1fd6690f9fa6f85f0c49\transformed\profileinstaller-1.3.1\AndroidManifest.xml:40:13-42:29
+action#androidx.profileinstaller.action.INSTALL_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9984e8b22e2f1fd6690f9fa6f85f0c49\transformed\profileinstaller-1.3.1\AndroidManifest.xml:41:17-91
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9984e8b22e2f1fd6690f9fa6f85f0c49\transformed\profileinstaller-1.3.1\AndroidManifest.xml:41:25-88
+intent-filter#action:name:androidx.profileinstaller.action.SKIP_FILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9984e8b22e2f1fd6690f9fa6f85f0c49\transformed\profileinstaller-1.3.1\AndroidManifest.xml:43:13-45:29
+action#androidx.profileinstaller.action.SKIP_FILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9984e8b22e2f1fd6690f9fa6f85f0c49\transformed\profileinstaller-1.3.1\AndroidManifest.xml:44:17-85
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9984e8b22e2f1fd6690f9fa6f85f0c49\transformed\profileinstaller-1.3.1\AndroidManifest.xml:44:25-82
+intent-filter#action:name:androidx.profileinstaller.action.SAVE_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9984e8b22e2f1fd6690f9fa6f85f0c49\transformed\profileinstaller-1.3.1\AndroidManifest.xml:46:13-48:29
+action#androidx.profileinstaller.action.SAVE_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9984e8b22e2f1fd6690f9fa6f85f0c49\transformed\profileinstaller-1.3.1\AndroidManifest.xml:47:17-88
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9984e8b22e2f1fd6690f9fa6f85f0c49\transformed\profileinstaller-1.3.1\AndroidManifest.xml:47:25-85
+intent-filter#action:name:androidx.profileinstaller.action.BENCHMARK_OPERATION
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9984e8b22e2f1fd6690f9fa6f85f0c49\transformed\profileinstaller-1.3.1\AndroidManifest.xml:49:13-51:29
+action#androidx.profileinstaller.action.BENCHMARK_OPERATION
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9984e8b22e2f1fd6690f9fa6f85f0c49\transformed\profileinstaller-1.3.1\AndroidManifest.xml:50:17-95
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\omsat\.gradle\caches\9.6.0\transforms\9984e8b22e2f1fd6690f9fa6f85f0c49\transformed\profileinstaller-1.3.1\AndroidManifest.xml:50:25-92

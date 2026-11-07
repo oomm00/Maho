@@ -1,0 +1,18 @@
+R_DEF: Internal format may change without notice
+local
+color ic_bg
+drawable ic_drag_handle
+drawable ic_fg
+drawable ic_grid_view
+drawable ic_image_error
+drawable ic_new_folder
+drawable ic_note
+drawable ic_notif
+drawable ic_placeholder
+drawable ic_receipt
+drawable ic_sort
+drawable ic_theme
+drawable ic_view_list
+mipmap ic_launcher
+style Theme.DropWatch
+xml file_paths
