@@ -1,4 +1,4 @@
-# Shipping & Signing Guide for DropWatch
+# Shipping & Signing Guide for Maho
 
 This guide explains how to generate a signing key, configure release signing, build production release artifacts (APK and AAB), and verify the signed outputs.
 
@@ -6,18 +6,18 @@ This guide explains how to generate a signing key, configure release signing, bu
 
 ## 1. Generate a Release Keystore
 
-Run the following `keytool` command in your terminal to create a production keystore file (`dropwatch-release.jks`):
+Run the following `keytool` command in your terminal to create a production keystore file (`maho-release.jks`):
 
 ```bash
 keytool -genkeypair -v \
-  -keystore dropwatch-release.jks \
-  -alias dropwatch_key \
+  -keystore maho-release.jks \
+  -alias maho_key \
   -keyalg RSA \
   -keysize 2048 \
   -validity 10000
 ```
 
-> ⚠️ **CRITICAL WARNING:** Back up your `dropwatch-release.jks` file and passwords securely (e.g. in a password manager). If you lose this keystore file, Google Play will **NOT** allow you to push updates to existing users.
+> ⚠️ **CRITICAL WARNING:** Back up your `maho-release.jks` file and passwords securely (e.g. in a password manager). If you lose this keystore file, Google Play will **NOT** allow you to push updates to existing users.
 
 ---
 
@@ -32,13 +32,13 @@ keytool -genkeypair -v \
 2. Open `keystore.properties` and fill in your actual keystore details:
 
    ```properties
-   storeFile=dropwatch-release.jks
+   storeFile=maho-release.jks
    storePassword=your_actual_store_password
-   keyAlias=dropwatch_key
+   keyAlias=maho_key
    keyPassword=your_actual_key_password
    ```
 
-> 🔒 Both `dropwatch-release.jks` and `keystore.properties` are listed in `.gitignore` to prevent committing sensitive keys to git.
+> 🔒 Both `maho-release.jks` and `keystore.properties` are listed in `.gitignore` to prevent committing sensitive keys to git.
 
 ---
 
@@ -61,7 +61,7 @@ From the project root folder, run:
 1. Open Android Studio.
 2. Go to **Build** > **Generate Signed App Bundle / APK**.
 3. Choose **Android App Bundle** or **APK**, click **Next**.
-4. Select `dropwatch-release.jks`, enter passwords, and select `release` build variant.
+4. Select `maho-release.jks`, enter passwords, and select `release` build variant.
 5. Click **Create**.
 
 ---
@@ -96,3 +96,4 @@ Expected output:
 Signer #1 certificate DN: ...
 Signer #1 certificate SHA-256 digest: ...
 ```
+
