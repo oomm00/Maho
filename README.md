@@ -24,20 +24,20 @@ The landing page lives in [`docs/`](docs/) and is served directly from the `main
 
 ---
 
-## ✨ Features
+##  Features
 
-- 🖼️ **Image-Led Folder Cards**: Automatic 2x2 photo collage covers generated from your saved items.
-- ⚡ **1:1 Smooth Collapsing Header**: Fluid 60/120 FPS top bar and search field that collapse smoothly on scroll down and reappear instantly on scroll up.
-- 📉 **Price History & Charting**: Interactive Canvas line graph with range filters (`1M`, `3M`, `6M`, `1Y`, `All`), lowest/highest/average stats, and touch scrubbing tooltips.
-- 🔀 **Drag-to-Reorder**: Smooth reordering with scale, elevation, and haptic feedback via `sh.calvin.reorderable`.
-- 💱 **Multi-Currency Support**: Per-product currency overrides, foreign currency detection warnings, and manual exchange rate conversion.
-- 🧾 **Bill Export**: Generate and share itemized plain-text receipts with per-currency subtotal breakdowns.
-- 🔔 **Background Price Checks**: Periodic WorkManager worker checking store pages for price drops with Android 13+ runtime notifications.
-- 🎨 **Editorial Palette**: Warm dark (`#0E0E0E`) & warm paper (`#F6F3EC`) theme with Space Grotesk & Inter typography.
+- **Image-Led Folder Cards**: Automatic 2x2 photo collage covers generated from your saved items.
+- **1:1 Smooth Collapsing Header**: Fluid 60/120 FPS top bar and search field that collapse smoothly on scroll down and reappear instantly on scroll up.
+- **Price History & Charting**: Interactive Canvas line graph with range filters (`1M`, `3M`, `6M`, `1Y`, `All`), lowest/highest/average stats, and touch scrubbing tooltips.
+- **Drag-to-Reorder**: Smooth reordering with scale, elevation, and haptic feedback via `sh.calvin.reorderable`.
+- **Multi-Currency Support**: Per-product currency overrides, foreign currency detection warnings, and manual exchange rate conversion.
+- **Bill Export**: Generate and share itemised plain-text receipts with per-currency subtotal breakdowns.
+- **Background Price Checks**: Periodic WorkManager worker checking store pages for price drops with Android 13+ runtime notifications.
+- **Editorial Palette**: Warm dark (`#0E0E0E`) & warm paper (`#F6F3EC`) theme with Space Grotesk & Inter typography.
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **UI Framework**: Jetpack Compose (Material 3)
 - **Architecture**: ViewModel, StateFlow, Coroutines, Clean Architecture
@@ -49,7 +49,7 @@ The landing page lives in [`docs/`](docs/) and is served directly from the `main
 
 ---
 
-## 🚀 Building & Shipping
+## Building & Shipping
 
 1. Open the project in **Android Studio**.
 2. Let Gradle sync dependencies.
@@ -67,7 +67,7 @@ For signing and building release APK/AAB distribution packages, see **[`SHIPPING
 
 ---
 
-## 👤 Author
+## Author
 
 Built by [@omsneakycow](https://instagram.com/omsneakycow).
 
