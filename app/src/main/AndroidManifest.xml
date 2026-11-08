@@ -4,11 +4,11 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
-        android:name=".DropWatchApp"
+        android:name=".MahoApp"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
-        android:label="DropWatch"
-        android:theme="@style/Theme.DropWatch"
+        android:label="Maho"
+        android:theme="@style/Theme.Maho"
         android:usesCleartextTraffic="false">
         <activity
             android:name=".MainActivity"
@@ -19,7 +19,7 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <!-- Share a product link from any browser/app straight into DropWatch -->
+            <!-- Share a product link from any browser/app straight into Maho -->
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />

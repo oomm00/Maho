@@ -22,12 +22,14 @@ object BillHelper {
         val eqLine = "=".repeat(LINE_WIDTH)
         val dashLine = "-".repeat(LINE_WIDTH)
 
+        val safeFolderName = folderName.replace(Regex("[\\r\\n\\t]"), " ").trim()
+
         sb.appendLine(eqLine)
-        sb.appendLine(centerText("DROPWATCH BILL", LINE_WIDTH))
+        sb.appendLine(centerText("MAHO BILL", LINE_WIDTH))
         sb.appendLine(eqLine)
 
         val dateFormat = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault())
-        sb.appendLine("Folder : $folderName")
+        sb.appendLine("Folder : $safeFolderName")
         sb.appendLine("Date   : ${dateFormat.format(Date())}")
         sb.appendLine("Items  : ${products.size}")
         sb.appendLine(dashLine)
@@ -37,9 +39,8 @@ object BillHelper {
         products.forEachIndexed { index, p ->
             val num = "${index + 1}"
             val priceStr = money(p.price, p.currency)
-            val title = p.title.replace('\n', ' ').trim()
+            val title = p.title.replace(Regex("[\\r\\n\\t]"), " ").trim()
 
-            // Wrap title to max 25 chars per line
             val titleLines = wrapText(title, 25)
             val firstLine = titleLines.firstOrNull() ?: ""
 
@@ -49,7 +50,7 @@ object BillHelper {
             }
             sb.appendLine("    ${p.url}")
             if (!p.note.isNullOrBlank()) {
-                val noteLines = wrapText("Note: ${p.note.replace('\n', ' ').trim()}", 36)
+                val noteLines = wrapText("Note: ${p.note.replace(Regex("[\\r\\n\\t]"), " ").trim()}", 36)
                 for (nl in noteLines) {
                     sb.appendLine(String.format(Locale.getDefault(), "    %-36s", nl))
                 }
@@ -66,7 +67,7 @@ object BillHelper {
             .mapValues { entry -> entry.value.sumOf { it.price ?: 0.0 } }
 
         if (totalsByCurrency.isEmpty()) {
-            sb.appendLine(String.format(Locale.getDefault(), "%-20s %19s", "SUBTOTAL", "₹0"))
+            sb.appendLine(String.format(Locale.getDefault(), "%-20s %19s", "SUBTOTAL", money(0.0, "INR")))
         } else if (totalsByCurrency.size == 1) {
             val (cur, sum) = totalsByCurrency.entries.first()
             sb.appendLine(String.format(Locale.getDefault(), "%-20s %19s", "SUBTOTAL", money(sum, cur)))
@@ -77,7 +78,7 @@ object BillHelper {
         }
 
         sb.appendLine(eqLine)
-        sb.appendLine("Prices as last checked by DropWatch.")
+        sb.appendLine("Prices as last checked by Maho.")
         sb.appendLine("Thank you!")
 
         return sb.toString()
@@ -112,12 +113,11 @@ object BillHelper {
     fun saveBillAndGetShareUri(ctx: Context, folderName: String, billContent: String): Pair<Uri?, Uri?> {
         val safeFolder = folderName.replace(Regex("[^a-zA-Z0-9_-]"), "_")
         val timestamp = SimpleDateFormat("yyyyMMdd_HHmm", Locale.getDefault()).format(Date())
-        val fileName = "DropWatch_Bill_${safeFolder}_${timestamp}.txt"
+        val fileName = "Maho_Bill_${safeFolder}_${timestamp}.txt"
 
         var downloadUri: Uri? = null
         var shareUri: Uri? = null
 
-        // 1. Save to Downloads via MediaStore on Android 10+
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 val values = ContentValues().apply {
@@ -139,32 +139,35 @@ object BillHelper {
                 downloadUri = Uri.fromFile(targetFile)
             }
         } catch (e: Exception) {
-            Log.e("BillHelper", "Error saving to Downloads: ${e.message}", e)
+            if (BuildConfig.DEBUG) Log.e("BillHelper", "Error saving to Downloads: ${e.message}", e)
         }
 
-        // 2. Save a copy in cache directory for FileProvider sharing
         try {
             val cacheFolder = File(ctx.cacheDir, "bills").apply { mkdirs() }
             val cacheFile = File(cacheFolder, fileName)
             cacheFile.writeText(billContent, Charsets.UTF_8)
             shareUri = FileProvider.getUriForFile(ctx, "${ctx.packageName}.fileprovider", cacheFile)
         } catch (e: Exception) {
-            Log.e("BillHelper", "Error preparing share URI: ${e.message}", e)
+            if (BuildConfig.DEBUG) Log.e("BillHelper", "Error preparing share URI: ${e.message}", e)
         }
 
         return Pair(downloadUri, shareUri)
     }
 
     fun shareBill(ctx: Context, shareUri: Uri?, billContent: String, folderName: String) {
-        val intent = Intent(Intent.ACTION_SEND).apply {
-            type = "text/plain"
-            putExtra(Intent.EXTRA_SUBJECT, "DropWatch Bill - $folderName")
-            putExtra(Intent.EXTRA_TEXT, billContent)
-            if (shareUri != null) {
-                putExtra(Intent.EXTRA_STREAM, shareUri)
-                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        try {
+            val intent = Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                putExtra(Intent.EXTRA_SUBJECT, "Maho Bill - $folderName")
+                putExtra(Intent.EXTRA_TEXT, billContent)
+                if (shareUri != null) {
+                    putExtra(Intent.EXTRA_STREAM, shareUri)
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }
             }
+            ctx.startActivity(Intent.createChooser(intent, "Share Maho Bill"))
+        } catch (e: Exception) {
+            if (BuildConfig.DEBUG) Log.e("BillHelper", "Error sharing bill: ${e.message}", e)
         }
-        ctx.startActivity(Intent.createChooser(intent, "Share DropWatch Bill"))
     }
 }

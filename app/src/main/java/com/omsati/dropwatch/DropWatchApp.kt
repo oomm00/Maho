@@ -5,7 +5,7 @@ import android.content.Context
 import androidx.work.*
 import java.util.concurrent.TimeUnit
 
-class DropWatchApp : Application() {
+class MahoApp : Application() {
     override fun onCreate() {
         super.onCreate()
         Notifier.ensureChannel(this)

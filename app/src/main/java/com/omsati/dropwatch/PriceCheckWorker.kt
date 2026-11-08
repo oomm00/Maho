@@ -8,33 +8,49 @@ import kotlinx.coroutines.delay
 
 class PriceCheckWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(ctx, params) {
     override suspend fun doWork(): Result {
-        Log.d("PriceCheck", "PriceCheckWorker started background price check")
+        if (BuildConfig.DEBUG) Log.d("PriceCheck", "PriceCheckWorker started background price check")
         val repo = Repo(applicationContext)
         val products = repo.dao.allProducts()
-        Log.d("PriceCheck", "Found ${products.size} total products to check")
+        if (BuildConfig.DEBUG) Log.d("PriceCheck", "Found ${products.size} total products to check")
+
+        var hasNetworkFailure = false
 
         for (old in products) {
-            val new = repo.check(old)
-            val o = old.price
-            val n = new.price
-            var notified = false
-            if (n != null) {
-                val dropped = o != null && n < o
-                val target = new.targetPrice
-                val hitTarget = target != null && n <= target && (o == null || o > target)
-                if (dropped || hitTarget) {
-                    Notifier.priceDrop(applicationContext, new, o, hitTarget)
-                    notified = true
+            try {
+                val new = repo.check(old)
+                if (new.status == "error") {
+                    hasNetworkFailure = true
                 }
+                val o = old.price
+                val n = new.price
+                var notified = false
+                if (n != null && n > 0) {
+                    val dropped = o != null && n < o
+                    val target = new.targetPrice
+                    val hitTarget = target != null && n <= target && (o == null || o > target)
+                    if (dropped || hitTarget) {
+                        Notifier.priceDrop(applicationContext, new, o, hitTarget)
+                        notified = true
+                    }
+                }
+                if (BuildConfig.DEBUG) {
+                    Log.d(
+                        "PriceCheck",
+                        "Product #${old.id}: oldPrice=$o, newPrice=$n, targetPrice=${old.targetPrice}, currency=${new.currency}, notified=$notified"
+                    )
+                }
+            } catch (e: Exception) {
+                hasNetworkFailure = true
+                if (BuildConfig.DEBUG) Log.e("PriceCheck", "Error checking product ${old.id}: ${e.message}", e)
             }
-            Log.d(
-                "PriceCheck",
-                "Product #${old.id} [${old.title}]: oldPrice=$o, newPrice=$n, targetPrice=${old.targetPrice}, currency=${new.currency}, notified=$notified"
-            )
-            delay(700) // be polite to stores
+            delay(500)
         }
 
-        Log.d("PriceCheck", "PriceCheckWorker finished successfully")
+        if (hasNetworkFailure && runAttemptCount < 3) {
+            return Result.retry()
+        }
+
+        if (BuildConfig.DEBUG) Log.d("PriceCheck", "PriceCheckWorker finished successfully")
         return Result.success()
     }
 }

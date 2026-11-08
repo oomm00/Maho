@@ -1,53 +1,31 @@
-@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
-
 package com.omsati.dropwatch
 
 import android.Manifest
-import android.content.ClipData
-import android.content.ClipboardManager
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import android.text.format.DateUtils
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
-import sh.calvin.reorderable.ReorderableItem
-import sh.calvin.reorderable.rememberReorderableLazyGridState
-import sh.calvin.reorderable.rememberReorderableLazyListState
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
+import androidx.compose.animation.*
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -59,18 +37,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
@@ -79,19 +57,43 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyGridState
+import sh.calvin.reorderable.rememberReorderableLazyListState
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import kotlin.math.roundToInt
 
+// -------------------------------------------------------------
+// COLLAPSING HEADER STATE
+// -------------------------------------------------------------
+class CollapsingHeaderState {
+    var heightPx by mutableFloatStateOf(0f)
+    var offsetPx by mutableFloatStateOf(0f)
+
+    val connection = object : NestedScrollConnection {
+        override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+            if (heightPx <= 0f) return Offset.Zero
+            val new = (offsetPx + available.y).coerceIn(-heightPx, 0f)
+            val consumed = new - offsetPx
+            offsetPx = new
+            return Offset(0f, consumed)
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun DropWatchRoot(
+fun MahoRoot(
     sharedUrl: String?, onSharedConsumed: () -> Unit,
     openId: Long?, onOpenConsumed: () -> Unit,
     vm: MainVm = viewModel(),
@@ -103,46 +105,11 @@ fun DropWatchRoot(
         ThemeMode.SYSTEM -> isSystemInDarkTheme()
     }
 
-    val context = LocalContext.current
-    val colorScheme = when {
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            if (isDark) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-        isDark -> darkColorScheme(
-            primary = Color(0xFF818CF8),
-            onPrimary = Color(0xFF1E1B4B),
-            primaryContainer = Color(0xFF312E81),
-            onPrimaryContainer = Color(0xFFE0E7FF),
-            secondary = Color(0xFFA5B4FC),
-            surface = Color(0xFF1E1E2E),
-            onSurface = Color(0xFFE2E8F0),
-            surfaceVariant = Color(0xFF272738),
-            onSurfaceVariant = Color(0xFF94A3B8),
-            background = Color(0xFF13131C),
-            onBackground = Color(0xFFF1F5F9),
-        )
-        else -> lightColorScheme(
-            primary = Color(0xFF4F46E5),
-            onPrimary = Color.White,
-            primaryContainer = Color(0xFFEEF2FF),
-            onPrimaryContainer = Color(0xFF312E81),
-            secondary = Color(0xFF6366F1),
-            surface = Color(0xFFFFFFFF),
-            onSurface = Color(0xFF0F172A),
-            surfaceVariant = Color(0xFFF1F5F9),
-            onSurfaceVariant = Color(0xFF64748B),
-            background = Color(0xFFF8FAFC),
-            onBackground = Color(0xFF0F172A),
-        )
-    }
-
-    val greenColor = if (isDark) Color(0xFF4ADE80) else Color(0xFF16A34A)
-
-    MaterialTheme(colorScheme = colorScheme) {
+    MahoTheme(isDark = isDark) {
         val snack = remember { SnackbarHostState() }
-        val scope = rememberCoroutineScope()
 
         // Navigation state
+        var isAboutOpen by rememberSaveable { mutableStateOf(false) }
         var isSettingsOpen by rememberSaveable { mutableStateOf(false) }
         var selectedProductId by rememberSaveable { mutableStateOf<Long?>(null) }
         var activeFolderId by rememberSaveable { mutableStateOf<Long?>(null) }
@@ -191,9 +158,10 @@ fun DropWatchRoot(
         }
 
         // Back navigation handling
-        BackHandler(enabled = (selectedProductId != null || isInFolder || isSettingsOpen)) {
+        BackHandler(enabled = (selectedProductId != null || isAboutOpen || isInFolder || isSettingsOpen)) {
             when {
                 selectedProductId != null -> selectedProductId = null
+                isAboutOpen -> isAboutOpen = false
                 isInFolder -> {
                     isInFolder = false
                     activeFolderId = null
@@ -203,11 +171,15 @@ fun DropWatchRoot(
         }
 
         when {
+            isAboutOpen -> {
+                AboutScreen(onBack = { isAboutOpen = false })
+            }
             isSettingsOpen -> {
                 SettingsScreen(
                     vm = vm,
                     snack = snack,
                     onBack = { isSettingsOpen = false },
+                    onOpenAbout = { isAboutOpen = true },
                 )
             }
             selectedProductId != null -> {
@@ -215,7 +187,7 @@ fun DropWatchRoot(
                     vm = vm,
                     id = selectedProductId!!,
                     snack = snack,
-                    greenColor = greenColor,
+                    greenColor = MutedGreen,
                     onBack = { selectedProductId = null },
                 )
             }
@@ -223,15 +195,13 @@ fun DropWatchRoot(
                 val folders by vm.folders.collectAsState()
                 val currentFolder = folders.firstOrNull { it.id == activeFolderId }
                 val folderName = if (activeFolderId == null) "Unsorted" else (currentFolder?.name ?: "Folder")
-                val folderEmoji = if (activeFolderId == null) "📦" else (currentFolder?.emoji ?: "📁")
 
                 FolderCatalogScreen(
                     vm = vm,
                     folderId = activeFolderId,
                     folderName = folderName,
-                    folderEmoji = folderEmoji,
                     snack = snack,
-                    greenColor = greenColor,
+                    greenColor = MutedGreen,
                     onBack = {
                         isInFolder = false
                         activeFolderId = null
@@ -255,6 +225,7 @@ fun DropWatchRoot(
                     },
                     onNewFolder = { showNewFolderDialog = true },
                     onOpenSettings = { isSettingsOpen = true },
+                    onOpenAbout = { isAboutOpen = true },
                     onEditFolder = { folderToEdit = it },
                     onDeleteFolder = { folderToDelete = it },
                 )
@@ -266,11 +237,10 @@ fun DropWatchRoot(
             FolderDialog(
                 title = "New folder",
                 initialName = "",
-                initialEmoji = "📁",
                 initialColor = 0xFF4F46E5L,
                 onDismiss = { showNewFolderDialog = false },
-                onSave = { name, emoji, color ->
-                    vm.addFolder(name, emoji, color)
+                onSave = { name, color ->
+                    vm.addFolder(name, "", color)
                     showNewFolderDialog = false
                 },
             )
@@ -282,11 +252,10 @@ fun DropWatchRoot(
                 FolderDialog(
                     title = "Rename folder",
                     initialName = summary.name,
-                    initialEmoji = summary.emoji,
                     initialColor = summary.color,
                     onDismiss = { folderToEdit = null },
-                    onSave = { name, emoji, color ->
-                        vm.renameFolder(summary.id, name, emoji, color)
+                    onSave = { name, color ->
+                        vm.renameFolder(summary.id, name, "", color)
                         folderToEdit = null
                     },
                 )
@@ -298,8 +267,10 @@ fun DropWatchRoot(
             if (!summary.isUnsorted && summary.id != null) {
                 AlertDialog(
                     onDismissRequest = { folderToDelete = null },
-                    title = { Text("Delete folder?") },
-                    text = { Text("Delete “${summary.emoji} ${summary.name}”? All products inside will be moved to Unsorted.") },
+                    shape = RoundedCornerShape(28.dp),
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                    title = { Text("Delete folder?", style = MaterialTheme.typography.titleLarge) },
+                    text = { Text("Delete “${summary.name}”? All products inside will be moved to Unsorted.") },
                     confirmButton = {
                         TextButton(
                             onClick = {
@@ -327,18 +298,20 @@ fun DropWatchRoot(
             )
         }
 
-        // Shared link folder picker bottom sheet
+        // Shared link bottom sheet picker
         pendingShareUrl?.let { url ->
             val folderSummaries by vm.folderSummaries.collectAsState()
             ModalBottomSheet(
                 onDismissRequest = { pendingShareUrl = null },
+                shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
+                containerColor = MaterialTheme.colorScheme.surfaceContainer,
             ) {
                 Column(
                     Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 24.dp, vertical = 16.dp)
                 ) {
-                    Text("Save to folder", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                    Text("Save to folder", style = MaterialTheme.typography.titleLarge)
                     Text(
                         url,
                         style = MaterialTheme.typography.bodySmall,
@@ -356,29 +329,24 @@ fun DropWatchRoot(
                             ListItem(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .clip(RoundedCornerShape(12.dp))
+                                    .clip(RoundedCornerShape(16.dp))
                                     .clickable {
                                         vm.add(url, f.id, "Other")
                                         pendingShareUrl = null
                                     },
-                                leadingContent = { Text(f.emoji, fontSize = 24.sp) },
-                                headlineContent = { Text(f.name, fontWeight = FontWeight.SemiBold) },
+                                headlineContent = { Text(f.name, style = MaterialTheme.typography.titleMedium) },
                                 supportingContent = { Text("${f.count} items · ${f.totalValue}") },
                             )
                         }
                     }
 
                     Spacer(Modifier.height(12.dp))
-                    OutlinedButton(
-                        onClick = {
-                            showNewFolderDialog = true
-                        },
+                    PillButton(
+                        text = "Create new folder",
+                        onClick = { showNewFolderDialog = true },
+                        isPrimary = false,
                         modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        Icon(painterResource(R.drawable.ic_new_folder), contentDescription = null, Modifier.size(20.dp))
-                        Spacer(Modifier.width(8.dp))
-                        Text("Create new folder")
-                    }
+                    )
                     Spacer(Modifier.height(24.dp))
                 }
             }
@@ -386,13 +354,13 @@ fun DropWatchRoot(
 
         // Manual price dialog
         productForManualPrice?.let { p ->
-            NumberDialog(
-                title = "Set price manually",
-                initial = p.price,
-                allowClear = false,
+            val defaultCur by vm.defaultCurrency.collectAsState()
+            EditPriceAndCurrencyDialog(
+                product = p,
+                defaultCurrency = defaultCur,
                 onDismiss = { productForManualPrice = null },
-                onSave = { newPrice ->
-                    newPrice?.let { vm.setManualPrice(p, it) }
+                onSave = { newPrice, newCurrency ->
+                    vm.updatePriceAndCurrency(p, newPrice, newCurrency)
                     productForManualPrice = null
                 },
             )
@@ -401,8 +369,9 @@ fun DropWatchRoot(
 }
 
 // -------------------------------------------------------------
-// HOME SCREEN (Folder-First, Material 3 Tinted Cards)
+// HOME SCREEN ("Your folders" with Smooth Collapsing Header)
 // -------------------------------------------------------------
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HomeScreen(
     vm: MainVm,
@@ -410,79 +379,153 @@ private fun HomeScreen(
     onOpenFolder: (Long?) -> Unit,
     onNewFolder: () -> Unit,
     onOpenSettings: () -> Unit,
+    onOpenAbout: () -> Unit,
     onEditFolder: (FolderSummary) -> Unit,
     onDeleteFolder: (FolderSummary) -> Unit,
 ) {
+    val density = LocalDensity.current
     val folderSummaries by vm.folderSummaries.collectAsState()
+    val allProducts by vm.all.collectAsState()
     val refreshing by vm.refreshing.collectAsState()
     var folderMenuTarget by remember { mutableStateOf<FolderSummary?>(null) }
 
+    val totalItemsCount = remember(folderSummaries) { folderSummaries.sumOf { it.count } }
+
+    val headerState = remember { CollapsingHeaderState() }
+
     Scaffold(
         snackbarHost = { SnackbarHost(snack) },
-        topBar = {
-            TopAppBar(
-                title = { Text("DropWatch", fontWeight = FontWeight.Bold) },
-                actions = {
-                    if (refreshing) {
-                        CircularProgressIndicator(Modifier.size(24.dp).padding(end = 8.dp), strokeWidth = 2.dp)
-                    } else {
-                        IconButton(onClick = { vm.refreshAll() }) {
-                            Icon(Icons.Default.Refresh, "Refresh all")
-                        }
-                    }
-                    IconButton(onClick = onOpenSettings) {
-                        Icon(Icons.Default.Settings, "Settings")
-                    }
-                    ThemeMenuButton(vm)
-                },
-            )
-        },
+        floatingActionButtonPosition = FabPosition.Center,
         floatingActionButton = {
-            ExtendedFloatingActionButton(
+            PillButton(
+                text = "New folder",
+                icon = Icons.Default.Add,
                 onClick = onNewFolder,
-                icon = { Icon(painterResource(R.drawable.ic_new_folder), contentDescription = null, Modifier.size(22.dp)) },
-                text = { Text("New folder") },
+                isPrimary = true,
             )
         },
-    ) { pad ->
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            contentPadding = PaddingValues(16.dp, 16.dp, 16.dp, 96.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.padding(pad).fillMaxSize(),
+    ) { innerPadding ->
+        PullToRefreshBox(
+            isRefreshing = refreshing,
+            onRefresh = { vm.refreshAll() },
+            modifier = Modifier
+                .padding(bottom = innerPadding.calculateBottomPadding())
+                .fillMaxSize(),
         ) {
-            item(span = { GridItemSpan(2) }) {
-                Text(
-                    "My Folders",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(bottom = 2.dp),
-                )
-            }
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .nestedScroll(headerState.connection)
+            ) {
+                LazyVerticalGrid(
+                    columns = GridCells.Adaptive(minSize = 160.dp),
+                    contentPadding = PaddingValues(
+                        top = with(density) { headerState.heightPx.toDp() } + 8.dp,
+                        bottom = 120.dp,
+                        start = 20.dp,
+                        end = 20.dp,
+                    ),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier.fillMaxSize(),
+                ) {
+                    items(folderSummaries, key = { it.id ?: -1L }, contentType = { "folder" }) { summary ->
+                        val images = remember(allProducts, summary.id) {
+                            allProducts
+                                .filter { it.folderId == summary.id && !it.imageUrl.isNullOrBlank() }
+                                .mapNotNull { it.imageUrl }
+                        }
 
-            items(folderSummaries, key = { it.id ?: -1L }) { f ->
-                FolderCard(
-                    summary = f,
-                    onClick = { onOpenFolder(f.id) },
-                    onLongClick = {
-                        if (!f.isUnsorted) folderMenuTarget = f
-                    },
-                )
+                        FolderCard(
+                            summary = summary,
+                            productImages = images,
+                            onClick = { onOpenFolder(summary.id) },
+                            onLongClick = {
+                                if (!summary.isUnsorted) folderMenuTarget = summary
+                            },
+                        )
+                    }
+                }
+
+                // Smooth Collapsing Header Column (no recomposition jitter, graphicsLayer translation)
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .onSizeChanged { headerState.heightPx = it.height.toFloat() }
+                        .graphicsLayer { translationY = headerState.offsetPx }
+                        .background(MaterialTheme.colorScheme.background)
+                ) {
+                    TopAppBar(
+                        title = {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    "MAHO",
+                                    style = MaterialTheme.typography.labelLarge,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    letterSpacing = 0.1.em,
+                                )
+                                Spacer(Modifier.width(4.dp))
+                                Box(
+                                    Modifier
+                                        .size(6.dp)
+                                        .clip(CircleShape)
+                                        .background(MaterialTheme.colorScheme.primary)
+                                )
+                            }
+                        },
+                        actions = {
+                            Surface(
+                                shape = CircleShape,
+                                color = MaterialTheme.colorScheme.surface,
+                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
+                                ) {
+                                    IconButton(onClick = { vm.refreshAll() }, modifier = Modifier.size(32.dp)) {
+                                        Icon(Icons.Default.Refresh, "Refresh all", modifier = Modifier.size(16.dp))
+                                    }
+                                    IconButton(onClick = onOpenAbout, modifier = Modifier.size(32.dp)) {
+                                        Icon(Icons.Default.Info, "About", modifier = Modifier.size(16.dp))
+                                    }
+                                    IconButton(onClick = onOpenSettings, modifier = Modifier.size(32.dp)) {
+                                        Icon(Icons.Default.Settings, "Settings", modifier = Modifier.size(16.dp))
+                                    }
+                                    ThemeMenuButton(vm, modifier = Modifier.size(32.dp))
+                                }
+                            }
+                        },
+                    )
+
+                    Column(Modifier.padding(horizontal = 20.dp, vertical = 8.dp)) {
+                        Text(
+                            "Your folders",
+                            style = MaterialTheme.typography.displayLarge,
+                        )
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            "${folderSummaries.size} folders · $totalItemsCount items",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
             }
         }
 
-        // Folder options menu sheet
         folderMenuTarget?.let { f ->
             ModalBottomSheet(
                 onDismissRequest = { folderMenuTarget = null },
+                shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
+                containerColor = MaterialTheme.colorScheme.surfaceContainer,
             ) {
                 Column(Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 16.dp)) {
-                    Text("${f.emoji} ${f.name}", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                    Text(f.name, style = MaterialTheme.typography.titleLarge)
                     Spacer(Modifier.height(16.dp))
                     ListItem(
-                        modifier = Modifier.fillMaxWidth().clickable {
+                        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).clickable {
                             folderMenuTarget = null
                             onEditFolder(f)
                         },
@@ -490,7 +533,7 @@ private fun HomeScreen(
                         headlineContent = { Text("Edit folder & color") },
                     )
                     ListItem(
-                        modifier = Modifier.fillMaxWidth().clickable {
+                        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).clickable {
                             folderMenuTarget = null
                             onDeleteFolder(f)
                         },
@@ -505,106 +548,15 @@ private fun HomeScreen(
     }
 }
 
-@Composable
-private fun FolderCard(
-    summary: FolderSummary,
-    onClick: () -> Unit,
-    onLongClick: () -> Unit,
-) {
-    val folderColor = Color(summary.color.toInt())
-    val isDark = isSystemInDarkTheme()
-
-    val cardBg = if (isDark) {
-        folderColor.copy(alpha = 0.22f)
-    } else {
-        folderColor.copy(alpha = 0.12f)
-    }
-
-    Card(
-        shape = RoundedCornerShape(18.dp),
-        colors = CardDefaults.cardColors(containerColor = cardBg),
-        border = BorderStroke(1.dp, folderColor.copy(alpha = if (isDark) 0.35f else 0.25f)),
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(18.dp))
-            .combinedClickable(
-                onClick = onClick,
-                onLongClick = onLongClick,
-            ),
-    ) {
-        Column(
-            Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            Row(
-                Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(summary.emoji, fontSize = 34.sp)
-                if (summary.latestImageUrl != null) {
-                    ProductAsyncImage(
-                        imageUrl = summary.latestImageUrl,
-                        pageUrl = null,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .size(52.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(MaterialTheme.colorScheme.surface),
-                    )
-                } else {
-                    Box(
-                        Modifier
-                            .size(52.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.6f)),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_placeholder),
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
-                            modifier = Modifier.size(24.dp),
-                        )
-                    }
-                }
-            }
-
-            Column {
-                Text(
-                    summary.name,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                Spacer(Modifier.height(2.dp))
-                Text(
-                    "${summary.count} ${if (summary.count == 1) "item" else "items"}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                Spacer(Modifier.height(4.dp))
-                Text(
-                    summary.totalValue,
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    color = folderColor,
-                )
-            }
-        }
-    }
-}
-
 // -------------------------------------------------------------
-// FOLDER SCREEN (Sorting, Reorder, Search, Notes, Selection, Bill)
+// FOLDER CATALOG SCREEN (Smooth Collapsing Header & Search)
 // -------------------------------------------------------------
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun FolderCatalogScreen(
     vm: MainVm,
     folderId: Long?,
     folderName: String,
-    folderEmoji: String,
     snack: SnackbarHostState,
     greenColor: Color,
     onBack: () -> Unit,
@@ -612,11 +564,13 @@ private fun FolderCatalogScreen(
     onSetPriceManually: (Product) -> Unit,
     onAddLink: () -> Unit,
 ) {
+    val density = LocalDensity.current
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val clipboardManager = LocalClipboardManager.current
     val products by vm.productsForFolder(folderId).collectAsState(initial = emptyList())
     val refreshing by vm.refreshing.collectAsState()
+    val defaultCurrency by vm.defaultCurrency.collectAsState()
     val folderSummaries by vm.folderSummaries.collectAsState()
     val currentSummary = remember(folderSummaries, folderId) {
         folderSummaries.firstOrNull { it.id == folderId }
@@ -627,63 +581,68 @@ private fun FolderCatalogScreen(
     var isGrid by rememberSaveable { mutableStateOf(true) }
     var searchQuery by rememberSaveable { mutableStateOf("") }
 
-    // 2) Gallery-style selection state
     var isSelectionMode by rememberSaveable { mutableStateOf(false) }
     var selectedIds by rememberSaveable { mutableStateOf(setOf<Long>()) }
+
+    var productForOptionsSheet by remember { mutableStateOf<Product?>(null) }
+    var productForCurrencyWarning by remember { mutableStateOf<Product?>(null) }
+    var productForEditPriceCurrency by remember { mutableStateOf<Product?>(null) }
     var productForNote by remember { mutableStateOf<Product?>(null) }
-    var productToConfirm by remember { mutableStateOf<Product?>(null) }
+    var productToConfirmVisit by remember { mutableStateOf<Product?>(null) }
     var productToDeleteSingle by remember { mutableStateOf<Product?>(null) }
     var showDeleteMultiDialog by remember { mutableStateOf(false) }
+    var showSortBottomSheet by remember { mutableStateOf(false) }
 
     val allSelected = products.isNotEmpty() && products.all { it.id in selectedIds }
     val selectedProducts = remember(products, selectedIds) {
         products.filter { it.id in selectedIds }
     }
 
-    // Currency totals for selected products
     val selectedWithPrice = selectedProducts.filter { it.price != null && it.price > 0 }
-    val withoutPriceCount = selectedProducts.size - selectedWithPrice.size
     val totalsByCurrency = selectedWithPrice
-        .groupBy { it.currency?.uppercase() ?: "INR" }
+        .groupBy { it.currency?.uppercase() ?: defaultCurrency }
         .mapValues { entry -> entry.value.sumOf { it.price ?: 0.0 } }
 
     val totalText = if (totalsByCurrency.isEmpty()) {
-        "₹0"
+        money(0.0, defaultCurrency)
     } else {
         totalsByCurrency.entries.joinToString(" · ") { (cur, sum) -> money(sum, cur) }
     }
 
-    // Sort / filter
-    val filteredProducts = remember(products, searchQuery, activeSortOption) {
-        val base = if (searchQuery.isBlank()) products else {
-            val q = searchQuery.trim()
-            products.filter {
-                it.title.contains(q, ignoreCase = true) ||
-                    it.domain.contains(q, ignoreCase = true) ||
-                    (!it.note.isNullOrBlank() && it.note.contains(q, ignoreCase = true))
+    val filteredProducts by remember(products, searchQuery, activeSortOption) {
+        derivedStateOf {
+            val base = if (searchQuery.isBlank()) products else {
+                val q = searchQuery.trim()
+                products.filter {
+                    it.title.contains(q, ignoreCase = true) ||
+                        it.domain.contains(q, ignoreCase = true) ||
+                        (!it.note.isNullOrBlank() && it.note.contains(q, ignoreCase = true))
+                }
             }
-        }
-        when (activeSortOption) {
-            FolderSortOption.MY_ORDER   -> base.sortedWith(compareBy<Product> { it.position }.thenBy { it.addedAt })
-            FolderSortOption.DATE_DESC  -> base.sortedByDescending { it.addedAt }
-            FolderSortOption.DATE_ASC   -> base.sortedBy { it.addedAt }
-            FolderSortOption.NAME_ASC   -> base.sortedBy { it.title.lowercase() }
-            FolderSortOption.NAME_DESC  -> base.sortedByDescending { it.title.lowercase() }
-            FolderSortOption.PRICE_ASC  -> base.sortedWith { a, b ->
-                val pa = a.price; val pb = b.price
-                when { pa != null && pa > 0 && pb != null && pb > 0 -> pa.compareTo(pb); pa != null && pa > 0 -> -1; pb != null && pb > 0 -> 1; else -> a.position.compareTo(b.position) }
-            }
-            FolderSortOption.PRICE_DESC -> base.sortedWith { a, b ->
-                val pa = a.price; val pb = b.price
-                when { pa != null && pa > 0 && pb != null && pb > 0 -> pb.compareTo(pa); pa != null && pa > 0 -> -1; pb != null && pb > 0 -> 1; else -> a.position.compareTo(b.position) }
+            when (activeSortOption) {
+                FolderSortOption.MY_ORDER   -> base.sortedWith(compareBy<Product> { it.position }.thenBy { it.addedAt })
+                FolderSortOption.DATE_DESC  -> base.sortedByDescending { it.addedAt }
+                FolderSortOption.DATE_ASC   -> base.sortedBy { it.addedAt }
+                FolderSortOption.NAME_ASC   -> base.sortedBy { it.title.lowercase() }
+                FolderSortOption.NAME_DESC  -> base.sortedByDescending { it.title.lowercase() }
+                FolderSortOption.PRICE_ASC  -> base.sortedWith { a, b ->
+                    val pa = a.price; val pb = b.price
+                    when { pa != null && pa > 0 && pb != null && pb > 0 -> pa.compareTo(pb); pa != null && pa > 0 -> -1; pb != null && pb > 0 -> 1; else -> a.position.compareTo(b.position) }
+                }
+                FolderSortOption.PRICE_DESC -> base.sortedWith { a, b ->
+                    val pa = a.price; val pb = b.price
+                    when { pa != null && pa > 0 && pb != null && pb > 0 -> pb.compareTo(pa); pa != null && pa > 0 -> -1; pb != null && pb > 0 -> 1; else -> a.position.compareTo(b.position) }
+                }
             }
         }
     }
+
     var localProducts by remember(filteredProducts) { mutableStateOf(filteredProducts) }
     LaunchedEffect(filteredProducts) { localProducts = filteredProducts }
     val isReorderEnabled = activeSortOption == FolderSortOption.MY_ORDER && searchQuery.isBlank() && !isSelectionMode
 
-    // Intercept back button when in selection mode
+    val headerState = remember { CollapsingHeaderState() }
+
     BackHandler(enabled = isSelectionMode) {
         isSelectionMode = false
         selectedIds = emptySet()
@@ -691,43 +650,29 @@ private fun FolderCatalogScreen(
 
     Scaffold(
         snackbarHost = { SnackbarHost(snack) },
-        topBar = {
+        floatingActionButtonPosition = FabPosition.Center,
+        floatingActionButton = {
             if (isSelectionMode) {
-                // Contextual selection top bar
-                TopAppBar(
-                    navigationIcon = {
-                        IconButton(onClick = {
-                            isSelectionMode = false
-                            selectedIds = emptySet()
-                        }) {
-                            Icon(Icons.Default.Close, "Cancel selection")
-                        }
-                    },
-                    title = {
-                        Text("${selectedIds.size} selected", fontWeight = FontWeight.Bold)
-                    },
-                    actions = {
-                        TextButton(
-                            onClick = {
-                                selectedIds = if (allSelected) emptySet() else products.map { it.id }.toSet()
-                            }
-                        ) {
-                            Text(if (allSelected) "Clear" else "Select all")
-                        }
-                        // Total indicator
+                Surface(
+                    shape = CircleShape,
+                    color = MaterialTheme.colorScheme.surfaceContainer,
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+                    modifier = Modifier.padding(bottom = 12.dp),
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    ) {
                         Text(
                             totalText,
-                            style = MaterialTheme.typography.labelLarge,
+                            style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.padding(horizontal = 6.dp),
                         )
-                        // Bill action
                         IconButton(
                             onClick = {
-                                if (selectedProducts.isEmpty()) {
-                                    scope.launch { snack.showSnackbar("Select at least 1 product to create a bill") }
-                                } else {
+                                if (selectedProducts.isNotEmpty()) {
                                     val bill = BillHelper.generateBill(folderName, selectedProducts)
                                     val (downloadUri, shareUri) = BillHelper.saveBillAndGetShareUri(context, folderName, bill)
                                     scope.launch {
@@ -741,259 +686,362 @@ private fun FolderCatalogScreen(
                                         }
                                     }
                                 }
-                            }
+                            },
+                            modifier = Modifier.size(24.dp),
                         ) {
-                            Icon(painterResource(R.drawable.ic_receipt), "Print bill", Modifier.size(22.dp))
+                            Icon(painterResource(R.drawable.ic_receipt), "Print bill", tint = MaterialTheme.colorScheme.onSurface)
                         }
-                        // Delete selected action
                         IconButton(
-                            onClick = {
-                                if (selectedIds.isNotEmpty()) showDeleteMultiDialog = true
-                            }
+                            onClick = { if (selectedIds.isNotEmpty()) showDeleteMultiDialog = true },
+                            modifier = Modifier.size(24.dp),
                         ) {
-                            Icon(Icons.Default.Delete, "Delete selected")
+                            Icon(Icons.Default.Delete, "Delete selected", tint = MaterialTheme.colorScheme.error)
                         }
-                    },
-                )
+                    }
+                }
             } else {
-                // Normal catalog top bar
-                TopAppBar(
-                    navigationIcon = {
-                        IconButton(onClick = onBack) {
-                            Icon(Icons.Default.ArrowBack, "Back to folders")
-                        }
-                    },
-                    title = {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(folderEmoji, fontSize = 22.sp)
-                            Spacer(Modifier.width(8.dp))
-                            Text(folderName, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                        }
-                    },
-                    actions = {
-                        // Sort menu
-                        var showSortMenu by remember { mutableStateOf(false) }
-                        Box {
-                            IconButton(onClick = { showSortMenu = true }) {
-                                Icon(painterResource(R.drawable.ic_sort), "Sort", Modifier.size(22.dp))
-                            }
-                            DropdownMenu(showSortMenu, { showSortMenu = false }) {
-                                FolderSortOption.entries.forEach { option ->
-                                    val sel = option == activeSortOption
-                                    DropdownMenuItem(
-                                        text = {
-                                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                                RadioButton(selected = sel, onClick = null, modifier = Modifier.size(20.dp))
-                                                Spacer(Modifier.width(8.dp))
-                                                Text(option.label, fontWeight = if (sel) FontWeight.Bold else FontWeight.Normal,
-                                                    color = if (sel) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface)
-                                            }
-                                        },
-                                        trailingIcon = if (sel) {{ Icon(Icons.Default.Check, null, tint = MaterialTheme.colorScheme.primary) }} else null,
-                                        onClick = {
-                                            showSortMenu = false
-                                            activeSortOption = option
-                                            vm.setFolderSortOption(folderId, option)
-                                        },
-                                    )
-                                }
-                            }
-                        }
-                        IconButton(onClick = { isGrid = !isGrid }) {
-                            Icon(
-                                painter = painterResource(if (isGrid) R.drawable.ic_view_list else R.drawable.ic_grid_view),
-                                contentDescription = if (isGrid) "Switch to list" else "Switch to grid",
-                                modifier = Modifier.size(22.dp),
-                            )
-                        }
-                        ThemeMenuButton(vm)
-                    },
+                PillButton(
+                    text = "Add link",
+                    icon = Icons.Default.Add,
+                    onClick = onAddLink,
+                    isPrimary = true,
                 )
             }
         },
-        bottomBar = {
-            // Bottom bar ONLY appears in selection mode
-            AnimatedVisibility(visible = isSelectionMode) {
-                Surface(
-                    tonalElevation = 6.dp,
-                    shadowElevation = 8.dp,
-                    color = MaterialTheme.colorScheme.surface,
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 14.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
+    ) { innerPadding ->
+        PullToRefreshBox(
+            isRefreshing = refreshing,
+            onRefresh = { vm.refreshAll() },
+            modifier = Modifier
+                .padding(bottom = innerPadding.calculateBottomPadding())
+                .fillMaxSize(),
+        ) {
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .nestedScroll(headerState.connection)
+            ) {
+                if (products.isEmpty()) {
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .padding(top = with(density) { headerState.heightPx.toDp() } + 16.dp, start = 32.dp, end = 32.dp),
+                        contentAlignment = Alignment.TopCenter,
                     ) {
-                        Column {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(top = 40.dp)) {
                             Text(
-                                "Selected: ${selectedProducts.size} items · Total $totalText",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
+                                "No items in $folderName yet",
+                                style = MaterialTheme.typography.titleLarge,
                             )
-                            if (withoutPriceCount > 0) {
-                                Text(
-                                    "$withoutPriceCount without price",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            Spacer(Modifier.height(8.dp))
+                            Text(
+                                "Tap “Add link” below or share a URL directly from your browser.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                textAlign = TextAlign.Center,
+                            )
+                        }
+                    }
+                } else if (localProducts.isEmpty()) {
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .padding(top = with(density) { headerState.heightPx.toDp() } + 32.dp),
+                        contentAlignment = Alignment.TopCenter,
+                    ) {
+                        Text("No matches for \"$searchQuery\"", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 40.dp))
+                    }
+                } else if (isGrid) {
+                    val gridState = rememberLazyGridState()
+                    val reorderGridState = rememberReorderableLazyGridState(gridState) { from, to ->
+                        localProducts = localProducts.toMutableList().apply { add(to.index, removeAt(from.index)) }
+                    }
+                    LazyVerticalGrid(
+                        state = gridState,
+                        columns = GridCells.Adaptive(minSize = 160.dp),
+                        contentPadding = PaddingValues(
+                            top = with(density) { headerState.heightPx.toDp() } + 8.dp,
+                            bottom = 120.dp,
+                            start = 20.dp,
+                            end = 20.dp,
+                        ),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        modifier = Modifier.fillMaxSize(),
+                    ) {
+                        items(localProducts, key = { it.id }, contentType = { "product" }) { p ->
+                            ReorderableItem(reorderGridState, key = p.id, enabled = isReorderEnabled) { isDragging ->
+                                val isSelected = p.id in selectedIds
+                                val haptic = LocalHapticFeedback.current
+                                val scale by animateFloatAsState(if (isDragging) 1.05f else 1.0f, label = "scale")
+
+                                ProductCardGrid(
+                                    p = p,
+                                    defaultCurrency = defaultCurrency,
+                                    isSelectionMode = isSelectionMode,
+                                    isSelected = isSelected,
+                                    greenColor = greenColor,
+                                    isReorderEnabled = isReorderEnabled,
+                                    isDragging = isDragging,
+                                    modifier = Modifier.graphicsLayer {
+                                        scaleX = scale
+                                        scaleY = scale
+                                    },
+                                    dragHandleModifier = with(this) {
+                                        Modifier.draggableHandle(
+                                            enabled = isReorderEnabled,
+                                            onDragStarted = {
+                                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                            },
+                                            onDragStopped = {
+                                                vm.updatePositions(localProducts.map { it.id })
+                                            }
+                                        )
+                                    },
+                                    onClick = {
+                                        if (isSelectionMode) {
+                                            selectedIds = if (isSelected) selectedIds - p.id else selectedIds + p.id
+                                        } else productToConfirmVisit = p
+                                    },
+                                    onLongClick = { if (!isSelectionMode) { selectedIds = setOf(p.id); isSelectionMode = true } },
+                                    onOptionsClick = { productForOptionsSheet = p },
+                                    onWarningChipClick = { productForCurrencyWarning = p },
+                                    onSetPrice = { onSetPriceManually(p) },
+                                )
+                            }
+                        }
+                    }
+                } else {
+                    val listState = rememberLazyListState()
+                    val reorderListState = rememberReorderableLazyListState(listState) { from, to ->
+                        localProducts = localProducts.toMutableList().apply { add(to.index, removeAt(from.index)) }
+                    }
+                    LazyColumn(
+                        state = listState,
+                        contentPadding = PaddingValues(
+                            top = with(density) { headerState.heightPx.toDp() } + 8.dp,
+                            bottom = 120.dp,
+                            start = 20.dp,
+                            end = 20.dp,
+                        ),
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        modifier = Modifier.fillMaxSize(),
+                    ) {
+                        items(localProducts, key = { it.id }, contentType = { "product" }) { p ->
+                            ReorderableItem(reorderListState, key = p.id, enabled = isReorderEnabled) { isDragging ->
+                                val isSelected = p.id in selectedIds
+                                val haptic = LocalHapticFeedback.current
+                                val scale by animateFloatAsState(if (isDragging) 1.03f else 1.0f, label = "scale")
+
+                                ProductCardList(
+                                    p = p,
+                                    defaultCurrency = defaultCurrency,
+                                    isSelectionMode = isSelectionMode,
+                                    isSelected = isSelected,
+                                    greenColor = greenColor,
+                                    isReorderEnabled = isReorderEnabled,
+                                    isDragging = isDragging,
+                                    modifier = Modifier.graphicsLayer {
+                                        scaleX = scale
+                                        scaleY = scale
+                                    },
+                                    dragHandleModifier = with(this) {
+                                        Modifier.draggableHandle(
+                                            enabled = isReorderEnabled,
+                                            onDragStarted = {
+                                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                            },
+                                            onDragStopped = {
+                                                vm.updatePositions(localProducts.map { it.id })
+                                            }
+                                        )
+                                    },
+                                    onClick = {
+                                        if (isSelectionMode) {
+                                            selectedIds = if (isSelected) selectedIds - p.id else selectedIds + p.id
+                                        } else productToConfirmVisit = p
+                                    },
+                                    onLongClick = { if (!isSelectionMode) { selectedIds = setOf(p.id); isSelectionMode = true } },
+                                    onOptionsClick = { productForOptionsSheet = p },
+                                    onWarningChipClick = { productForCurrencyWarning = p },
+                                    onSetPrice = { onSetPriceManually(p) },
                                 )
                             }
                         }
                     }
                 }
-            }
-        },
-        floatingActionButton = {
-            // Hide FAB in selection mode
-            if (!isSelectionMode) {
-                ExtendedFloatingActionButton(
-                    onClick = onAddLink,
-                    icon = { Icon(Icons.Default.Add, null) },
-                    text = { Text("Add link") },
-                )
-            }
-        },
-    ) { pad ->
-        PullToRefreshBox(
-            isRefreshing = refreshing,
-            onRefresh = { vm.refreshAll() },
-            modifier = Modifier.padding(pad).fillMaxSize(),
-        ) {
-            Column(Modifier.fillMaxSize()) {
-            // Search box (matches title, domain, note)
-            if (products.isNotEmpty()) {
-                OutlinedTextField(
-                    value = searchQuery,
-                    onValueChange = { searchQuery = it },
-                    placeholder = { Text("Search by name, domain, note…") },
-                    leadingIcon = { Icon(Icons.Default.Search, null, Modifier.size(20.dp)) },
-                    trailingIcon = {
-                        if (searchQuery.isNotEmpty()) {
-                            IconButton(onClick = { searchQuery = "" }) { Icon(Icons.Default.Close, "Clear", Modifier.size(18.dp)) }
-                        }
-                    },
-                    singleLine = true,
-                    shape = RoundedCornerShape(12.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
-                        focusedContainerColor = MaterialTheme.colorScheme.surface,
-                    ),
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 6.dp),
-                )
-            }
-            if (products.isEmpty()) {
-                Box(
-                    Modifier.fillMaxSize().padding(32.dp),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(folderEmoji, fontSize = 54.sp)
-                        Spacer(Modifier.height(14.dp))
-                        Text(
-                            "No products in $folderName yet",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                        )
-                        Spacer(Modifier.height(6.dp))
-                        Text(
-                            "Tap “Add link” below or share a product link directly from your browser.",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            textAlign = TextAlign.Center,
-                        )
-                    }
-                }
-            } else if (localProducts.isEmpty()) {
-                Box(Modifier.fillMaxSize().padding(32.dp), contentAlignment = Alignment.Center) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(Icons.Default.Search, null, Modifier.size(48.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Spacer(Modifier.height(12.dp))
-                        Text("No matches for \"$searchQuery\"", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                    }
-                }
-            } else if (isGrid) {
-                val gridState = rememberLazyGridState()
-                val reorderGridState = rememberReorderableLazyGridState(gridState) { from, to ->
-                    localProducts = localProducts.toMutableList().apply { add(to.index, removeAt(from.index)) }
-                }
-                LazyVerticalGrid(
-                    state = gridState,
-                    columns = GridCells.Fixed(2),
-                    contentPadding = PaddingValues(16.dp, 8.dp, 16.dp, if (isSelectionMode) 80.dp else 96.dp),
-                    horizontalArrangement = Arrangement.spacedBy(14.dp),
-                    verticalArrangement = Arrangement.spacedBy(14.dp),
-                    modifier = Modifier.fillMaxSize(),
-                ) {
-                    items(localProducts, key = { it.id }) { p ->
-                    ReorderableItem(reorderGridState, key = p.id, enabled = isReorderEnabled) { isDragging ->
-                        val isSelected = p.id in selectedIds
-                        ProductCatalogGridCard(
-                            p = p,
-                            isSelectionMode = isSelectionMode,
-                            isSelected = isSelected,
-                            greenColor = greenColor,
-                            isReorderEnabled = isReorderEnabled,
-                            isDragging = isDragging,
-                            dragModifier = Modifier.draggableHandle(enabled = isReorderEnabled, onDragStopped = { vm.updatePositions(localProducts.map { it.id }) }),
-                            onDisabledDragHint = { scope.launch { snack.showSnackbar("Switch to 'My order' to rearrange") } },
-                            onClick = {
-                                if (isSelectionMode) {
-                                    selectedIds = if (isSelected) selectedIds - p.id else selectedIds + p.id
-                                } else productToConfirm = p
-                            },
-                            onLongClick = { if (!isSelectionMode) { selectedIds = setOf(p.id); isSelectionMode = true } },
-                            onOpenNote = { productForNote = p },
-                            onPriceHistory = { onOpenHistory(p.id) },
-                            onCopyLink = { clipboardManager.setText(AnnotatedString(p.url)); scope.launch { snack.showSnackbar("Link copied") } },
-                            onDelete = { productToDeleteSingle = p },
-                            onSetPrice = { onSetPriceManually(p) },
-                        )
-                    } } // ReorderableItem + items
-                } // LazyVerticalGrid
-            } else {
-                val listState = rememberLazyListState()
-                val reorderListState = rememberReorderableLazyListState(listState) { from, to ->
-                    localProducts = localProducts.toMutableList().apply { add(to.index, removeAt(from.index)) }
-                }
-                LazyColumn(
-                    state = listState,
-                    contentPadding = PaddingValues(16.dp, 8.dp, 16.dp, if (isSelectionMode) 80.dp else 96.dp),
-                    verticalArrangement = Arrangement.spacedBy(14.dp),
-                    modifier = Modifier.fillMaxSize(),
-                ) {
-                    items(localProducts, key = { it.id }) { p ->
-                    ReorderableItem(reorderListState, key = p.id, enabled = isReorderEnabled) { isDragging ->
-                        val isSelected = p.id in selectedIds
-                        ProductCatalogListCard(
-                            p = p,
-                            isSelectionMode = isSelectionMode,
-                            isSelected = isSelected,
-                            greenColor = greenColor,
-                            isReorderEnabled = isReorderEnabled,
-                            isDragging = isDragging,
-                            dragModifier = Modifier.draggableHandle(enabled = isReorderEnabled, onDragStopped = { vm.updatePositions(localProducts.map { it.id }) }),
-                            onDisabledDragHint = { scope.launch { snack.showSnackbar("Switch to 'My order' to rearrange") } },
-                            onClick = {
-                                if (isSelectionMode) {
-                                    selectedIds = if (isSelected) selectedIds - p.id else selectedIds + p.id
-                                } else productToConfirm = p
-                            },
-                            onLongClick = { if (!isSelectionMode) { selectedIds = setOf(p.id); isSelectionMode = true } },
-                            onOpenNote = { productForNote = p },
-                            onPriceHistory = { onOpenHistory(p.id) },
-                            onCopyLink = { clipboardManager.setText(AnnotatedString(p.url)); scope.launch { snack.showSnackbar("Link copied") } },
-                            onDelete = { productToDeleteSingle = p },
-                            onSetPrice = { onSetPriceManually(p) },
-                        )
-                    } } // ReorderableItem + items
-                } // LazyColumn
-            }
-            } // Column wrapper
-        } // PullToRefreshBox
 
-        // Note dialog
+                // Smooth Collapsing Header Column (pinned in selection mode, graphicsLayer translated when scrolling)
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .onSizeChanged { headerState.heightPx = it.height.toFloat() }
+                        .graphicsLayer { translationY = if (isSelectionMode) 0f else headerState.offsetPx }
+                        .background(MaterialTheme.colorScheme.background)
+                ) {
+                    if (isSelectionMode) {
+                        TopAppBar(
+                            navigationIcon = {
+                                IconButton(onClick = {
+                                    isSelectionMode = false
+                                    selectedIds = emptySet()
+                                }) {
+                                    Icon(Icons.Default.Close, "Cancel selection")
+                                }
+                            },
+                            title = {
+                                Text("${selectedIds.size} selected", style = MaterialTheme.typography.titleLarge)
+                            },
+                            actions = {
+                                TextButton(
+                                    onClick = {
+                                        selectedIds = if (allSelected) emptySet() else products.map { it.id }.toSet()
+                                    }
+                                ) {
+                                    Text(if (allSelected) "CLEAR" else "SELECT ALL", style = MaterialTheme.typography.labelMedium)
+                                }
+                            },
+                        )
+                    } else {
+                        TopAppBar(
+                            navigationIcon = {
+                                IconButton(onClick = onBack) {
+                                    Icon(Icons.Default.ArrowBack, "Back to folders")
+                                }
+                            },
+                            title = {
+                                Text(folderName, style = MaterialTheme.typography.titleLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            },
+                            actions = {
+                                ThemeMenuButton(vm)
+                            },
+                        )
+
+                        Column(Modifier.padding(horizontal = 20.dp, vertical = 6.dp)) {
+                            BasicTextField(
+                                value = searchQuery,
+                                onValueChange = { searchQuery = it },
+                                singleLine = true,
+                                textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
+                                decorationBox = { innerTextField ->
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(bottom = 6.dp),
+                                        contentAlignment = Alignment.CenterStart,
+                                    ) {
+                                        if (searchQuery.isEmpty()) {
+                                            Text(
+                                                "Search by title, store, note…",
+                                                style = MaterialTheme.typography.bodyLarge,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                                            )
+                                        }
+                                        innerTextField()
+                                    }
+                                },
+                            )
+                            Box(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .height(1.dp)
+                                    .background(MaterialTheme.colorScheme.outline)
+                            )
+
+                            Spacer(Modifier.height(10.dp))
+
+                            Row(
+                                Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Text(
+                                    text = "SORT: ${activeSortOption.name.replace('_', ' ')}",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.clickable { showSortBottomSheet = true },
+                                )
+
+                                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                                    Text(
+                                        text = if (isGrid) "LIST VIEW" else "GRID VIEW",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.clickable { isGrid = !isGrid },
+                                    )
+                                    Text(
+                                        text = "SELECT",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.clickable { isSelectionMode = true },
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Product Options Bottom Sheet
+        productForOptionsSheet?.let { prod ->
+            ProductOptionsBottomSheet(
+                product = prod,
+                onDismiss = { productForOptionsSheet = null },
+                onOpenNote = { productForNote = prod },
+                onPriceHistory = { onOpenHistory(prod.id) },
+                onCopyLink = {
+                    clipboardManager.setText(AnnotatedString(prod.url))
+                    scope.launch { snack.showSnackbar("Link copied") }
+                },
+                onChangeCurrencyPrice = { productForEditPriceCurrency = prod },
+                onDelete = { productToDeleteSingle = prod },
+            )
+        }
+
+        // Sort Options Bottom Sheet
+        if (showSortBottomSheet) {
+            SortBottomSheet(
+                activeOption = activeSortOption,
+                onDismiss = { showSortBottomSheet = false },
+                onSelect = { option ->
+                    activeSortOption = option
+                    vm.setFolderSortOption(folderId, option)
+                },
+            )
+        }
+
+        // Currency Warning Dialog
+        productForCurrencyWarning?.let { prod ->
+            CurrencyWarningDialog(
+                product = prod,
+                defaultCurrency = defaultCurrency,
+                onDismiss = { productForCurrencyWarning = null },
+                onSwitchCurrency = {
+                    vm.switchProductCurrency(prod, defaultCurrency)
+                    productForCurrencyWarning = null
+                },
+                onConvertRate = { rate ->
+                    vm.convertProductCurrency(prod, defaultCurrency, rate)
+                    productForCurrencyWarning = null
+                },
+            )
+        }
+
+        // Edit Price and Currency Dialog
+        productForEditPriceCurrency?.let { prod ->
+            EditPriceAndCurrencyDialog(
+                product = prod,
+                defaultCurrency = defaultCurrency,
+                onDismiss = { productForEditPriceCurrency = null },
+                onSave = { newPrice, newCurrency ->
+                    vm.updatePriceAndCurrency(prod, newPrice, newCurrency)
+                    productForEditPriceCurrency = null
+                },
+            )
+        }
+
+        // Note Dialog
         productForNote?.let { prod ->
             NoteDialog(
                 productTitle = prod.title,
@@ -1005,31 +1053,14 @@ private fun FolderCatalogScreen(
         }
 
         // Visit product dialog
-        productToConfirm?.let { prod ->
-            AlertDialog(
-                onDismissRequest = { productToConfirm = null },
-                title = { Text("Visit product link?") },
-                text = {
-                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        Text(prod.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-                        Text(prod.domain, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
-                },
-                confirmButton = {
-                    Button(
-                        onClick = {
-                            val url = prod.url
-                            productToConfirm = null
-                            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-                        }
-                    ) {
-                        Text("Visit")
-                    }
-                },
-                dismissButton = {
-                    TextButton(onClick = { productToConfirm = null }) {
-                        Text("Cancel")
-                    }
+        productToConfirmVisit?.let { prod ->
+            VisitProductDialog(
+                product = prod,
+                onDismiss = { productToConfirmVisit = null },
+                onVisit = {
+                    val url = prod.url
+                    productToConfirmVisit = null
+                    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
                 },
             )
         }
@@ -1038,7 +1069,9 @@ private fun FolderCatalogScreen(
         productToDeleteSingle?.let { prod ->
             AlertDialog(
                 onDismissRequest = { productToDeleteSingle = null },
-                title = { Text("Remove product?") },
+                shape = RoundedCornerShape(28.dp),
+                containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                title = { Text("Remove product?", style = MaterialTheme.typography.titleLarge) },
                 text = { Text("“${prod.title}” will be removed along with its price history.") },
                 confirmButton = {
                     TextButton(
@@ -1058,7 +1091,9 @@ private fun FolderCatalogScreen(
         if (showDeleteMultiDialog) {
             AlertDialog(
                 onDismissRequest = { showDeleteMultiDialog = false },
-                title = { Text("Delete ${selectedIds.size} products?") },
+                shape = RoundedCornerShape(28.dp),
+                containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                title = { Text("Delete ${selectedIds.size} products?", style = MaterialTheme.typography.titleLarge) },
                 text = { Text("The selected products and their price history will be permanently deleted.") },
                 confirmButton = {
                     TextButton(
@@ -1079,396 +1114,113 @@ private fun FolderCatalogScreen(
 }
 
 // -------------------------------------------------------------
-// CATALOG PRODUCT CARD (GRID VIEW)
+// ABOUT SCREEN ("Meet the creature")
 // -------------------------------------------------------------
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ProductCatalogGridCard(
-    p: Product,
-    isSelectionMode: Boolean,
-    isSelected: Boolean,
-    greenColor: Color,
-    isReorderEnabled: Boolean = false,
-    isDragging: Boolean = false,
-    dragModifier: Modifier = Modifier,
-    onDisabledDragHint: () -> Unit = {},
-    onClick: () -> Unit,
-    onLongClick: () -> Unit,
-    onOpenNote: () -> Unit = {},
-    onPriceHistory: () -> Unit,
-    onCopyLink: () -> Unit,
-    onDelete: () -> Unit,
-    onSetPrice: () -> Unit,
-) {
-    val haptic = LocalHapticFeedback.current
-    var menuExpanded by remember { mutableStateOf(false) }
-
-    val dropped = p.price != null && p.previousPrice != null && p.price < p.previousPrice
-    val pctOff = if (dropped && p.previousPrice != null && p.price != null && p.previousPrice > 0) {
-        (((p.previousPrice - p.price) / p.previousPrice) * 100).roundToInt()
-    } else 0
-
-    val checkedText = if (p.lastCheckedAt > 0) {
-        DateUtils.getRelativeTimeSpanString(p.lastCheckedAt).toString()
-    } else ""
-
-    val border = when {
-        isSelectionMode && isSelected -> BorderStroke(2.5.dp, MaterialTheme.colorScheme.primary)
-        !p.note.isNullOrBlank() -> BorderStroke(2.dp, MaterialTheme.colorScheme.tertiary)
-        else -> null
+private fun AboutScreen(onBack: () -> Unit) {
+    val context = LocalContext.current
+    val versionName = remember(context) {
+        runCatching {
+            context.packageManager.getPackageInfo(context.packageName, 0).versionName
+        }.getOrDefault("1.0")
     }
 
-    Card(
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = if (isDragging) 8.dp else 2.dp),
-        border = border,
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .combinedClickable(
-                onClick = onClick,
-                onLongClick = {
-                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                    onLongClick()
+    BackHandler(onBack = onBack)
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("ABOUT", style = MaterialTheme.typography.labelLarge) },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                    }
                 },
-            ),
-    ) {
-        Column {
-            Box(Modifier.fillMaxWidth().height(140.dp)) {
-                ProductAsyncImage(
-                    imageUrl = p.imageUrl,
-                    pageUrl = p.url,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.surfaceVariant),
-                )
-
-                // Bottom gradient scrim
-                Box(
-                    Modifier
-                        .fillMaxWidth()
-                        .height(48.dp)
-                        .align(Alignment.BottomCenter)
-                        .background(
-                            Brush.verticalGradient(
-                                colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.5f))
-                            )
-                        )
-                )
-
-                // Selection Checkbox with smooth animation
-                androidx.compose.animation.AnimatedVisibility(
-                    visible = isSelectionMode,
-                    enter = fadeIn() + scaleIn(),
-                    exit = fadeOut() + scaleOut(),
-                    modifier = Modifier.align(Alignment.TopEnd).padding(6.dp),
-                ) {
-                    Box(
-                        Modifier
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.9f)),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Checkbox(
-                            checked = isSelected,
-                            onCheckedChange = { onClick() },
-                            modifier = Modifier.size(32.dp),
-                        )
-                    }
-                }
-
-                // Top-start: drag handle + note icon
-                if (!isSelectionMode) {
-                    Row(
-                        Modifier.align(Alignment.TopStart).padding(6.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    ) {
-                        Box(
-                            Modifier.size(30.dp).clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.85f))
-                                .then(if (isReorderEnabled) dragModifier else Modifier.clickable { onDisabledDragHint() }),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            Icon(painterResource(R.drawable.ic_drag_handle), null,
-                                tint = if (isReorderEnabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
-                                modifier = Modifier.size(16.dp))
-                        }
-                        if (!p.note.isNullOrBlank()) {
-                            Box(
-                                Modifier.size(30.dp).clip(CircleShape)
-                                    .background(MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.9f))
-                                    .clickable { onOpenNote() },
-                                contentAlignment = Alignment.Center,
-                            ) {
-                                Icon(painterResource(R.drawable.ic_note), "Note",
-                                    tint = MaterialTheme.colorScheme.onTertiaryContainer, modifier = Modifier.size(14.dp))
-                            }
-                        }
-                    }
-                }
-
-                // ⋮ Overflow menu button (hidden in selection mode)
-                if (!isSelectionMode) {
-                    Box(Modifier.align(Alignment.TopEnd).padding(4.dp)) {
-                        IconButton(
-                            onClick = { menuExpanded = true },
-                            modifier = Modifier
-                                .size(32.dp)
-                                .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.75f)),
-                        ) {
-                            Icon(Icons.Default.MoreVert, "Options", Modifier.size(18.dp))
-                        }
-
-                        DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
-                            DropdownMenuItem(
-                                leadingIcon = { Icon(painterResource(R.drawable.ic_note), null, Modifier.size(18.dp)) },
-                                text = { Text(if (p.note.isNullOrBlank()) "Add note" else "Edit note") },
-                                onClick = { menuExpanded = false; onOpenNote() },
-                            )
-                            DropdownMenuItem(
-                                text = { Text("Price history") },
-                                onClick = { menuExpanded = false; onPriceHistory() },
-                            )
-                            DropdownMenuItem(
-                                text = { Text("Copy link") },
-                                onClick = { menuExpanded = false; onCopyLink() },
-                            )
-                            DropdownMenuItem(
-                                text = { Text("Delete", color = MaterialTheme.colorScheme.error) },
-                                onClick = { menuExpanded = false; onDelete() },
-                            )
-                        }
-                    }
-                }
-            }
-
-            Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                Text(
-                    p.title,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.SemiBold,
-                )
-
-                // Store chip
-                Surface(
-                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
-                    shape = RoundedCornerShape(6.dp),
-                ) {
-                    Text(
-                        p.domain,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
-                    )
-                }
-
-                if (p.status == "no_price" || p.price == null) {
-                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text(
-                            if (p.status == "fetching") "Fetching price…" else "Price unavailable",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = if (p.status == "fetching") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
-                        )
-                        OutlinedButton(
-                            onClick = onSetPrice,
-                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
-                            modifier = Modifier.height(30.dp),
-                        ) {
-                            Text("Set price", fontSize = 11.sp)
-                        }
-                    }
-                } else {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            money(p.price, p.currency),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = if (dropped) greenColor else MaterialTheme.colorScheme.onSurface,
-                        )
-                        if (dropped) {
-                            Spacer(Modifier.width(6.dp))
-                            Surface(
-                                color = greenColor.copy(alpha = 0.15f),
-                                shape = RoundedCornerShape(6.dp),
-                            ) {
-                                Text(
-                                    "▼ $pctOff% off",
-                                    style = MaterialTheme.typography.labelSmall,
-                                    fontWeight = FontWeight.Bold,
-                                    color = greenColor,
-                                    modifier = Modifier.padding(horizontal = 5.dp, vertical = 2.dp),
-                                )
-                            }
-                        }
-                    }
-                }
-
-                if (checkedText.isNotBlank()) {
-                    Text(
-                        "Checked $checkedText",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                        fontSize = 10.sp,
-                    )
-                }
-            }
+            )
         }
-    }
-}
-
-// -------------------------------------------------------------
-// CATALOG PRODUCT CARD (LIST VIEW)
-// -------------------------------------------------------------
-@Composable
-private fun ProductCatalogListCard(
-    p: Product,
-    isSelectionMode: Boolean,
-    isSelected: Boolean,
-    greenColor: Color,
-    isReorderEnabled: Boolean = false,
-    isDragging: Boolean = false,
-    dragModifier: Modifier = Modifier,
-    onDisabledDragHint: () -> Unit = {},
-    onClick: () -> Unit,
-    onLongClick: () -> Unit,
-    onOpenNote: () -> Unit = {},
-    onPriceHistory: () -> Unit,
-    onCopyLink: () -> Unit,
-    onDelete: () -> Unit,
-    onSetPrice: () -> Unit,
-) {
-    val haptic = LocalHapticFeedback.current
-    var menuExpanded by remember { mutableStateOf(false) }
-
-    val dropped = p.price != null && p.previousPrice != null && p.price < p.previousPrice
-    val pctOff = if (dropped && p.previousPrice != null && p.price != null && p.previousPrice > 0) {
-        (((p.previousPrice - p.price) / p.previousPrice) * 100).roundToInt()
-    } else 0
-
-    val checkedText = if (p.lastCheckedAt > 0) DateUtils.getRelativeTimeSpanString(p.lastCheckedAt).toString() else ""
-
-    val border = when {
-        isSelectionMode && isSelected -> BorderStroke(2.5.dp, MaterialTheme.colorScheme.primary)
-        !p.note.isNullOrBlank() -> BorderStroke(2.dp, MaterialTheme.colorScheme.tertiary)
-        else -> null
-    }
-
-    Card(
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = if (isDragging) 8.dp else 1.dp),
-        border = border,
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .combinedClickable(
-                onClick = onClick,
-                onLongClick = { haptic.performHapticFeedback(HapticFeedbackType.LongPress); onLongClick() },
-            ),
-    ) {
-        Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-            // Drag handle (only when not in selection mode)
-            if (!isSelectionMode) {
-                Box(
-                    Modifier.size(36.dp).clip(CircleShape)
-                        .then(if (isReorderEnabled) dragModifier else Modifier.clickable { onDisabledDragHint() }),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Icon(
-                        painterResource(R.drawable.ic_drag_handle), null,
-                        tint = if (isReorderEnabled) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
-                        modifier = Modifier.size(20.dp),
+    ) { pad ->
+        LazyColumn(
+            modifier = Modifier.padding(pad).fillMaxSize(),
+            contentPadding = PaddingValues(20.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp)
+        ) {
+            item {
+                Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                    Text("Meet the creature", style = MaterialTheme.typography.displayMedium)
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        "Maho saves the stuff you want to buy and yells when it gets cheaper. No ads, no accounts, no tracking. Your list stays on your phone, where it can't embarrass you in public.",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                    Text(
+                        "One person built this. He is humble, slightly feral, and he likes talking to people.",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Text(
+                        "So talk to him. Go to his DMs and shoot your funniest joke. If it's good, he might reply. If it's bad, he'll still read it, and he'll remember.",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
-                Spacer(Modifier.width(4.dp))
             }
 
-            AnimatedVisibility(visible = isSelectionMode) {
-                Checkbox(checked = isSelected, onCheckedChange = { onClick() }, modifier = Modifier.padding(end = 6.dp))
-            }
-
-            Box {
-                ProductAsyncImage(
-                    imageUrl = p.imageUrl, pageUrl = p.url, contentScale = ContentScale.Crop,
-                    modifier = Modifier.size(86.dp).clip(RoundedCornerShape(12.dp))
-                        .background(MaterialTheme.colorScheme.surfaceVariant),
-                )
-                if (!p.note.isNullOrBlank()) {
-                    Box(
-                        Modifier.align(Alignment.TopStart).padding(3.dp)
-                            .size(22.dp).clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.tertiaryContainer)
-                            .clickable { onOpenNote() },
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Icon(painterResource(R.drawable.ic_note), "Note",
-                            tint = MaterialTheme.colorScheme.onTertiaryContainer, modifier = Modifier.size(13.dp))
-                    }
-                }
-            }
-
-            Spacer(Modifier.width(12.dp))
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
-                Text(p.title, maxLines = 2, overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
-                Surface(color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f), shape = RoundedCornerShape(6.dp)) {
-                    Text("${p.domain} · ${p.category}", style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp))
-                }
-
-                if (p.status == "no_price" || p.price == null) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Text(if (p.status == "fetching") "Fetching…" else "No price", style = MaterialTheme.typography.bodySmall,
-                            color = if (p.status == "fetching") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error)
-                        OutlinedButton(onClick = onSetPrice,
-                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
-                            modifier = Modifier.height(30.dp)) { Text("Set price", fontSize = 11.sp) }
-                    }
-                } else {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(money(p.price, p.currency), style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = if (dropped) greenColor else MaterialTheme.colorScheme.onSurface)
-                        if (dropped) {
-                            Spacer(Modifier.width(8.dp))
-                            Surface(color = greenColor.copy(alpha = 0.15f), shape = RoundedCornerShape(6.dp)) {
-                                Text("▼ $pctOff% off", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold,
-                                    color = greenColor, modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp))
+            item {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    // Primary Accent Button
+                    PillButton(
+                        text = "Slide into his DMs  @omsneakycow",
+                        onClick = {
+                            try {
+                                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://instagram.com/omsneakycow")))
+                            } catch (e: ActivityNotFoundException) {
+                                // Handled
                             }
-                        }
-                    }
-                }
+                        },
+                        isPrimary = true,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
 
-                if (checkedText.isNotBlank()) {
-                    Text("Checked $checkedText", style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f), fontSize = 10.sp)
+                    // Secondary Outlined Buttons
+                    PillButton(
+                        text = "GitHub: oomm00",
+                        onClick = {
+                            try {
+                                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/oomm00")))
+                            } catch (e: ActivityNotFoundException) {
+                                // Handled
+                            }
+                        },
+                        isPrimary = false,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+
+                    PillButton(
+                        text = "X: @Omsneakycow",
+                        onClick = {
+                            try {
+                                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://x.com/Omsneakycow")))
+                            } catch (e: ActivityNotFoundException) {
+                                // Handled
+                            }
+                        },
+                        isPrimary = false,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
                 }
             }
 
-            // ⋮ Menu (not in selection mode)
-            if (!isSelectionMode) {
-                Box {
-                    IconButton(onClick = { menuExpanded = true }) { Icon(Icons.Default.MoreVert, "Options") }
-                    DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
-                        DropdownMenuItem(
-                            leadingIcon = { Icon(painterResource(R.drawable.ic_note), null, Modifier.size(18.dp)) },
-                            text = { Text(if (p.note.isNullOrBlank()) "Add note" else "Edit note") },
-                            onClick = { menuExpanded = false; onOpenNote() },
-                        )
-                        DropdownMenuItem(text = { Text("Price history") }, onClick = { menuExpanded = false; onPriceHistory() })
-                        DropdownMenuItem(text = { Text("Copy link") }, onClick = { menuExpanded = false; onCopyLink() })
-                        DropdownMenuItem(
-                            text = { Text("Delete", color = MaterialTheme.colorScheme.error) },
-                            onClick = { menuExpanded = false; onDelete() }
-                        )
-                    }
-                }
+            item {
+                Spacer(Modifier.height(16.dp))
+                Text(
+                    "Maho v$versionName. Built by a creature, not a company.",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth(),
+                )
             }
         }
     }
@@ -1477,15 +1229,19 @@ private fun ProductCatalogListCard(
 // -------------------------------------------------------------
 // SETTINGS SCREEN
 // -------------------------------------------------------------
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SettingsScreen(
     vm: MainVm,
     snack: SnackbarHostState,
     onBack: () -> Unit,
+    onOpenAbout: () -> Unit,
 ) {
     val context = LocalContext.current
     val currentInterval by vm.checkIntervalHours.collectAsState()
+    val defaultCur by vm.defaultCurrency.collectAsState()
     val intervals = listOf(1, 3, 6, 12, 24)
+    val currencies = listOf("INR" to "₹ INR", "USD" to "$ USD", "EUR" to "€ EUR", "GBP" to "£ GBP")
 
     val notificationsEnabled = remember(context) {
         NotificationManagerCompat.from(context).areNotificationsEnabled()
@@ -1495,7 +1251,7 @@ private fun SettingsScreen(
         snackbarHost = { SnackbarHost(snack) },
         topBar = {
             TopAppBar(
-                title = { Text("Settings", fontWeight = FontWeight.Bold) },
+                title = { Text("SETTINGS", style = MaterialTheme.typography.labelLarge) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.Default.ArrowBack, "Back")
@@ -1508,170 +1264,92 @@ private fun SettingsScreen(
         },
     ) { pad ->
         LazyColumn(
-            Modifier
-                .padding(pad)
-                .fillMaxSize(),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(18.dp),
+            Modifier.padding(pad).fillMaxSize(),
+            contentPadding = PaddingValues(20.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp),
         ) {
-            // Notification permission warning banner
             if (!notificationsEnabled) {
                 item {
-                    Card(
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer),
-                        shape = RoundedCornerShape(16.dp),
+                    Surface(
+                        color = MaterialTheme.colorScheme.errorContainer,
+                        shape = RoundedCornerShape(20.dp),
                         modifier = Modifier.fillMaxWidth(),
                     ) {
                         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.Default.Warning, null, tint = MaterialTheme.colorScheme.error)
-                                Spacer(Modifier.width(8.dp))
-                                Text(
-                                    "Notifications are disabled",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.onErrorContainer,
-                                )
-                            }
-                            Text(
-                                "DropWatch needs notification permissions to alert you when prices drop.",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onErrorContainer,
-                            )
-                            Button(
+                            Text("Notifications disabled", style = MaterialTheme.typography.titleMedium)
+                            Text("Enable notifications to receive price drop alerts.", style = MaterialTheme.typography.bodyMedium)
+                            PillButton(
+                                text = "Open notification settings",
                                 onClick = {
                                     val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
                                         putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
                                     }
                                     context.startActivity(intent)
                                 },
-                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
-                            ) {
-                                Text("Open notification settings")
-                            }
+                                isPrimary = true,
+                            )
                         }
                     }
                 }
             }
 
-            // Notifications section
             item {
-                Card(
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
-                    shape = RoundedCornerShape(16.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        Text("Notifications", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                        Text(
-                            "Test that price drop alerts appear on your device with sound/vibration.",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                        OutlinedButton(
-                            onClick = { vm.sendTestNotification() },
-                            modifier = Modifier.fillMaxWidth(),
-                        ) {
-                            Icon(Icons.Default.Notifications, null, Modifier.size(18.dp))
-                            Spacer(Modifier.width(8.dp))
-                            Text("Send test notification")
-                        }
-                    }
-                }
-            }
-
-            // Check Interval section
-            item {
-                Card(
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
-                    shape = RoundedCornerShape(16.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        Text("Price check frequency", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                        Text(
-                            "How often DropWatch runs in the background to check store pages.",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("ABOUT", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Surface(
+                        shape = RoundedCornerShape(16.dp),
+                        color = MaterialTheme.colorScheme.surfaceContainer,
+                        modifier = Modifier.fillMaxWidth().clickable { onOpenAbout() },
+                    ) {
                         Row(
-                            Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween,
                         ) {
-                            intervals.forEach { h ->
-                                FilterChip(
-                                    selected = currentInterval == h,
-                                    onClick = { vm.setCheckInterval(h) },
-                                    label = { Text("${h}h") },
-                                    modifier = Modifier.weight(1f),
-                                )
-                            }
+                            Text("About Maho & Creator", style = MaterialTheme.typography.bodyLarge)
+                            Icon(Icons.Default.ArrowForward, contentDescription = null, modifier = Modifier.size(18.dp))
                         }
                     }
                 }
             }
 
-            // Manual Check All Now
             item {
-                Card(
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
-                    shape = RoundedCornerShape(16.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        Text("Instant price check", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                        Text(
-                            "Trigger an immediate background check for all saved items via WorkManager.",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                        Button(
-                            onClick = { vm.checkAllPricesNow() },
-                            modifier = Modifier.fillMaxWidth(),
-                        ) {
-                            Icon(Icons.Default.Refresh, null, Modifier.size(18.dp))
-                            Spacer(Modifier.width(8.dp))
-                            Text("Check all prices now")
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("DEFAULT CURRENCY", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        currencies.forEach { (code, label) ->
+                            FilterChip(
+                                selected = defaultCur.equals(code, ignoreCase = true),
+                                onClick = { vm.setDefaultCurrency(code) },
+                                label = { Text(label, style = MaterialTheme.typography.bodySmall) },
+                                modifier = Modifier.weight(1f),
+                            )
                         }
                     }
                 }
             }
 
-            // Battery Optimization Note & Settings
             item {
-                Card(
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
-                    shape = RoundedCornerShape(16.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.Info, null, tint = MaterialTheme.colorScheme.primary)
-                            Spacer(Modifier.width(8.dp))
-                            Text("Battery optimization note", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                        }
-                        Text(
-                            "Android may delay background checks when battery saver is on or when background battery optimization is active. If you want on-time alerts, you can exclude DropWatch from battery restrictions.",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                        OutlinedButton(
-                            onClick = {
-                                try {
-                                    val intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
-                                    context.startActivity(intent)
-                                } catch (e: Exception) {
-                                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                                        data = Uri.fromParts("package", context.packageName, null)
-                                    }
-                                    context.startActivity(intent)
-                                }
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-                        ) {
-                            Text("Battery optimization settings")
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("PRICE CHECK FREQUENCY", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        intervals.forEach { h ->
+                            FilterChip(
+                                selected = currentInterval == h,
+                                onClick = { vm.setCheckInterval(h) },
+                                label = { Text("${h}h", style = MaterialTheme.typography.bodySmall) },
+                                modifier = Modifier.weight(1f),
+                            )
                         }
                     }
+                }
+            }
+
+            item {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text("ACTIONS", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    PillButton(text = "Check all prices now", onClick = { vm.checkAllPricesNow() }, isPrimary = true, modifier = Modifier.fillMaxWidth())
+                    PillButton(text = "Send test notification", onClick = { vm.sendTestNotification() }, isPrimary = false, modifier = Modifier.fillMaxWidth())
                 }
             }
         }
@@ -1679,8 +1357,9 @@ private fun SettingsScreen(
 }
 
 // -------------------------------------------------------------
-// DETAIL SCREEN (With 1-Year Price History Graph & Canvas Line Chart)
+// DETAIL SCREEN
 // -------------------------------------------------------------
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DetailScreen(
     vm: MainVm,
@@ -1689,32 +1368,49 @@ private fun DetailScreen(
     greenColor: Color,
     onBack: () -> Unit,
 ) {
-    val ctx = LocalContext.current
-    val p by vm.product(id).collectAsState(initial = null)
+    val context = LocalContext.current
+    val productState = vm.product(id).collectAsState(initial = null)
+    val product = productState.value
     val history by vm.history(id).collectAsState(initial = emptyList())
-    val folders by vm.folders.collectAsState()
+    val defaultCur by vm.defaultCurrency.collectAsState()
 
-    var dlg by remember { mutableStateOf("") } // "target" | "price" | "delete" | "title"
-    var folderMenu by remember { mutableStateOf(false) }
+    var dlg by remember { mutableStateOf("") }
 
-    val current = p
-    if (current == null) {
-        LaunchedEffect(Unit) { onBack() }
+    LaunchedEffect(history, id) {
+        if (BuildConfig.DEBUG) Log.d("History", "Loaded ${history.size} price points for product $id")
+    }
+
+    var isInitialLoading by remember { mutableStateOf(true) }
+    LaunchedEffect(id) {
+        delay(400)
+        isInitialLoading = false
+    }
+
+    if (product == null) {
+        if (isInitialLoading) {
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
+        } else {
+            LaunchedEffect(Unit) { onBack() }
+        }
         return
     }
-    val product: Product = current
 
     Scaffold(
         snackbarHost = { SnackbarHost(snack) },
         topBar = {
             TopAppBar(
-                title = { Text(product.domain, fontWeight = FontWeight.Bold) },
+                title = { Text(product.domain.uppercase(), style = MaterialTheme.typography.labelLarge) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.Default.ArrowBack, "Back")
                     }
                 },
                 actions = {
+                    IconButton(onClick = { dlg = "currency_price" }) {
+                        Icon(Icons.Default.Edit, "Edit price")
+                    }
                     IconButton(onClick = { vm.refresh(product) }) {
                         Icon(Icons.Default.Refresh, "Refresh")
                     }
@@ -1725,11 +1421,28 @@ private fun DetailScreen(
                 },
             )
         },
+        bottomBar = {
+            Surface(
+                modifier = Modifier.fillMaxWidth().padding(20.dp),
+                color = Color.Transparent,
+            ) {
+                PillButton(
+                    text = "Visit store",
+                    onClick = {
+                        runCatching {
+                            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(product.url)))
+                        }
+                    },
+                    isPrimary = true,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+        },
     ) { pad ->
         LazyColumn(
             Modifier.padding(pad),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp)
+            contentPadding = PaddingValues(20.dp, 12.dp, 20.dp, 80.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             item {
                 ProductAsyncImage(
@@ -1738,279 +1451,100 @@ private fun DetailScreen(
                     contentScale = ContentScale.Fit,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(240.dp)
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(MaterialTheme.colorScheme.surfaceVariant),
+                        .height(280.dp)
+                        .clip(RoundedCornerShape(24.dp))
+                        .background(MaterialTheme.colorScheme.surfaceContainer),
                 )
             }
 
             item {
-                Row(
-                    Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.Top
-                ) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(
                         product.title,
                         style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.weight(1f).clickable { dlg = "title" },
+                        modifier = Modifier.clickable { dlg = "title" },
                     )
-                    IconButton(onClick = { dlg = "title" }) {
-                        Icon(Icons.Default.Edit, "Edit title", Modifier.size(20.dp))
-                    }
-                }
-            }
-
-            item {
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(
                         money(product.price, product.currency),
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.displayLarge,
+                        color = MaterialTheme.colorScheme.primary,
                     )
                     if (product.lastCheckedAt > 0) {
                         Text(
-                            "Checked " + DateUtils.getRelativeTimeSpanString(product.lastCheckedAt),
-                            style = MaterialTheme.typography.bodySmall,
+                            "LAST CHECKED ${DateUtils.getRelativeTimeSpanString(product.lastCheckedAt).toString().uppercase()}",
+                            style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
-                    if (product.status == "error") {
-                        Text("Couldn't load the store page last time.", color = MaterialTheme.colorScheme.error)
-                    }
-                    if (product.status == "no_price") {
-                        Text("No price found on page. You can set it manually below.", color = MaterialTheme.colorScheme.error)
-                    }
                 }
             }
 
-            item {
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Button(onClick = { ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(product.url))) }) {
-                        Text("Open store")
-                    }
-                    OutlinedButton(onClick = { dlg = "price" }) {
-                        Text("Set price")
-                    }
-                    OutlinedButton(onClick = { dlg = "title" }) {
-                        Text("Edit title")
-                    }
-                }
-            }
-
-            item {
-                Card(
-                    shape = RoundedCornerShape(14.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
-                    modifier = Modifier.fillMaxWidth().clickable { dlg = "target" }
-                ) {
-                    Column(Modifier.padding(16.dp)) {
-                        Text("Alert me at or below", style = MaterialTheme.typography.labelLarge)
-                        Spacer(Modifier.height(4.dp))
-                        Text(
-                            product.targetPrice?.let { money(it, product.currency) } ?: "Not set (alerts for any drop)",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold,
-                        )
-                    }
-                }
-            }
-
-            item {
-                Box {
-                    OutlinedButton(onClick = { folderMenu = true }) {
-                        val currentF = folders.firstOrNull { it.id == product.folderId }
-                        val label = if (currentF != null) "${currentF.emoji} ${currentF.name}" else "📦 Unsorted"
-                        Text("Folder: $label")
-                    }
-                    DropdownMenu(folderMenu, { folderMenu = false }) {
-                        DropdownMenuItem(
-                            text = { Text("📦 Unsorted") },
-                            onClick = {
-                                vm.update(product.copy(folderId = null))
-                                folderMenu = false
-                            }
-                        )
-                        folders.forEach { f ->
-                            DropdownMenuItem(
-                                text = { Text("${f.emoji} ${f.name}") },
-                                onClick = {
-                                    vm.update(product.copy(folderId = f.id))
-                                    folderMenu = false
-                                },
-                            )
-                        }
-                    }
-                }
-            }
-
-            item {
-                Text("Category", style = MaterialTheme.typography.labelLarge)
-                Spacer(Modifier.height(4.dp))
-                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    items(SuggestedCategories) { c ->
-                        FilterChip(
-                            selected = product.category == c,
-                            onClick = { vm.update(product.copy(category = c)) },
-                            label = { Text(c) },
-                        )
-                    }
-                }
-            }
-
-            // Note Card on Detail Screen
-            item {
-                Card(
-                    shape = RoundedCornerShape(14.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = if (product.note.isNullOrBlank()) {
-                            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-                        } else {
-                            MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.35f)
-                        }
-                    ),
-                    border = if (!product.note.isNullOrBlank()) BorderStroke(1.5.dp, MaterialTheme.colorScheme.tertiary) else null,
-                    modifier = Modifier.fillMaxWidth().clickable { dlg = "note" },
-                ) {
-                    Column(Modifier.padding(16.dp)) {
-                        Row(
-                            Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    painter = painterResource(R.drawable.ic_note),
-                                    contentDescription = null,
-                                    tint = if (!product.note.isNullOrBlank()) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = Modifier.size(20.dp),
-                                )
-                                Spacer(Modifier.width(8.dp))
-                                Text("Note", style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold)
-                            }
-                            TextButton(onClick = { dlg = "note" }) {
-                                Text(if (product.note.isNullOrBlank()) "Add note" else "Edit")
-                            }
-                        }
-                        if (!product.note.isNullOrBlank()) {
-                            Spacer(Modifier.height(6.dp))
-                            Text(
-                                product.note,
-                                style = MaterialTheme.typography.bodyMedium,
-                            )
-                        } else {
-                            Text(
-                                "No note added yet. Tap to add sizes, promo codes, reminders, etc.",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                    }
-                }
-            }
-
-            // 4) ONE YEAR OF PRICE HISTORY WITH A GRAPH & STATS
             item {
                 PriceHistorySection(
                     history = history,
+                    product = product,
                     currentPrice = product.price,
-                    currency = product.currency,
+                    currency = product.currency ?: defaultCur,
                     greenColor = greenColor,
                 )
             }
-
-            // Below the chart keep the list of price changes
-            if (history.isNotEmpty()) {
-                item {
-                    Text("Price changes", style = MaterialTheme.typography.labelLarge, modifier = Modifier.padding(top = 8.dp))
-                }
-                items(history.reversed()) { h ->
-                    Row(
-                        Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                    ) {
-                        Text(
-                            DateUtils.formatDateTime(ctx, h.at, DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_TIME),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                        Text(
-                            money(h.price, product.currency),
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.SemiBold,
-                        )
-                    }
-                }
-            }
         }
-    }
 
-    when (dlg) {
-        "target" -> NumberDialog(
-            title = "Target price",
-            initial = product.targetPrice,
-            allowClear = true,
-            onDismiss = { dlg = "" },
-            onSave = {
-                vm.update(product.copy(targetPrice = it))
-                dlg = ""
-            },
-        )
-        "price" -> NumberDialog(
-            title = "Current price",
-            initial = product.price,
-            allowClear = false,
-            onDismiss = { dlg = "" },
-            onSave = {
-                it?.let { v -> vm.setManualPrice(product, v) }
-                dlg = ""
-            },
-        )
-        "title" -> TextEditDialog(
-            title = "Edit product title",
-            initial = product.title,
-            onDismiss = { dlg = "" },
-            onSave = {
-                if (it.isNotBlank()) vm.updateTitle(product, it)
-                dlg = ""
-            },
-        )
-        "delete" -> AlertDialog(
-            onDismissRequest = { dlg = "" },
-            title = { Text("Remove this product?") },
-            text = { Text("“${product.title}” will be deleted along with its price history.") },
-            confirmButton = {
-                TextButton(onClick = {
-                    vm.delete(product.id)
+        if (dlg == "delete") {
+            AlertDialog(
+                onDismissRequest = { dlg = "" },
+                shape = RoundedCornerShape(28.dp),
+                containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                title = { Text("Delete product?", style = MaterialTheme.typography.titleLarge) },
+                text = { Text("“${product.title}” and its price history will be deleted.") },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            dlg = ""
+                            vm.delete(product.id)
+                            onBack()
+                        }
+                    ) { Text("Delete", color = MaterialTheme.colorScheme.error) }
+                },
+                dismissButton = {
+                    TextButton(onClick = { dlg = "" }) { Text("Cancel") }
+                },
+            )
+        }
+
+        if (dlg == "title") {
+            TextEditDialog(
+                title = "Edit title",
+                initial = product.title,
+                onDismiss = { dlg = "" },
+                onSave = { newTitle ->
+                    vm.updateTitle(product, newTitle)
                     dlg = ""
-                    onBack()
-                }) { Text("Remove", color = MaterialTheme.colorScheme.error) }
-            },
-            dismissButton = { TextButton(onClick = { dlg = "" }) { Text("Cancel") } },
-        )
-        "note" -> NoteDialog(
-            productTitle = product.title,
-            initialNote = product.note ?: "",
-            onDismiss = { dlg = "" },
-            onSave = {
-                vm.updateNote(product.id, it)
-                dlg = ""
-            },
-            onDeleteNote = {
-                vm.updateNote(product.id, null)
-                dlg = ""
-            },
-        )
+                },
+            )
+        }
+
+        if (dlg == "currency_price") {
+            EditPriceAndCurrencyDialog(
+                product = product,
+                defaultCurrency = defaultCur,
+                onDismiss = { dlg = "" },
+                onSave = { newPrice, newCurrency ->
+                    vm.updatePriceAndCurrency(product, newPrice, newCurrency)
+                    dlg = ""
+                },
+            )
+        }
     }
 }
 
 // -------------------------------------------------------------
-// PRICE HISTORY SECTION (Range Chips, Canvas Chart, Tooltip, Stats)
+// PRICE HISTORY SECTION
 // -------------------------------------------------------------
 @Composable
 private fun PriceHistorySection(
     history: List<PricePoint>,
+    product: Product,
     currentPrice: Double?,
     currency: String?,
     greenColor: Color,
@@ -2030,73 +1564,85 @@ private fun PriceHistorySection(
         history.filter { it.at >= cutoff }
     }
 
-    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        Row(
-            Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text("Price history", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-            LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                items(ranges) { r ->
-                    FilterChip(
-                        selected = range == r,
-                        onClick = { range = r },
-                        label = { Text(r, fontSize = 12.sp) },
-                    )
-                }
-            }
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        Text("PRICE HISTORY", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+
+        if (filtered.size >= 2) {
+            SegmentedTextControl(
+                options = ranges,
+                selectedOption = range,
+                onOptionSelected = { range = it },
+            )
         }
 
         if (filtered.size < 2) {
+            val singlePointDate = remember(history, product.addedAt) {
+                val at = history.firstOrNull()?.at ?: product.addedAt
+                SimpleDateFormat("MMM d, yyyy", Locale.getDefault()).format(Date(at))
+            }
+            val primaryColor = MaterialTheme.colorScheme.primary
+
             Card(
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)),
-                shape = RoundedCornerShape(14.dp),
-                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
+                shape = RoundedCornerShape(24.dp),
+                modifier = Modifier.fillMaxWidth(),
             ) {
-                Box(Modifier.padding(20.dp).fillMaxWidth(), contentAlignment = Alignment.Center) {
+                Column(
+                    Modifier.padding(20.dp).fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                ) {
+                    Text("TRACKING STARTED $singlePointDate", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Text(
-                        "Not enough data yet. The graph fills in as prices are checked.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        textAlign = TextAlign.Center,
+                        money(currentPrice, currency),
+                        style = MaterialTheme.typography.displayMedium,
+                        color = primaryColor,
                     )
+
+                    Box(
+                        Modifier
+                            .fillMaxWidth()
+                            .height(100.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(MaterialTheme.colorScheme.surface),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Canvas(Modifier.fillMaxSize()) {
+                            val cy = size.height / 2f
+                            drawLine(
+                                color = primaryColor.copy(alpha = 0.4f),
+                                start = Offset(24.dp.toPx(), cy),
+                                end = Offset(size.width - 24.dp.toPx(), cy),
+                                strokeWidth = 2.dp.toPx(),
+                                pathEffect = PathEffect.dashPathEffect(floatArrayOf(12f, 8f), 0f),
+                            )
+                            drawCircle(primaryColor, radius = 6.dp.toPx(), center = Offset(size.width / 2f, cy))
+                            drawCircle(Color.White, radius = 3.dp.toPx(), center = Offset(size.width / 2f, cy))
+                        }
+                        Text(
+                            "Price changes will appear here",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(top = 48.dp),
+                        )
+                    }
                 }
             }
         } else {
-            // Stats row: Lowest, Highest, Average, Current vs Lowest
             val prices = filtered.map { it.price }
             val minP = prices.minOrNull() ?: 0.0
             val maxP = prices.maxOrNull() ?: 0.0
             val avgP = prices.average()
 
-            val currentVsLowestText = if (currentPrice != null) {
-                if (currentPrice <= minP) {
-                    "At lowest!"
-                } else {
-                    val diff = currentPrice - minP
-                    val pct = ((diff / minP) * 100).roundToInt()
-                    "+${money(diff, currency)} (+$pct%)"
-                }
-            } else "—"
-
-            Card(
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)),
-                shape = RoundedCornerShape(14.dp),
-                modifier = Modifier.fillMaxWidth(),
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
             ) {
-                Row(
-                    Modifier.fillMaxWidth().padding(12.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                ) {
-                    StatItem("Lowest", money(minP, currency), greenColor)
-                    StatItem("Highest", money(maxP, currency))
-                    StatItem("Average", money(avgP, currency))
-                    StatItem("Vs Lowest", currentVsLowestText, if (currentPrice != null && currentPrice <= minP) greenColor else MaterialTheme.colorScheme.primary)
-                }
+                StatItem("LOWEST", money(minP, currency), greenColor)
+                StatItem("HIGHEST", money(maxP, currency))
+                StatItem("AVERAGE", money(avgP, currency))
             }
 
-            // Interactive Canvas Line Chart
             InteractivePriceChart(
                 points = filtered,
                 currency = currency,
@@ -2108,10 +1654,10 @@ private fun PriceHistorySection(
 
 @Composable
 private fun StatItem(label: String, value: String, valueColor: Color = MaterialTheme.colorScheme.onSurface) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    Column {
         Text(label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Spacer(Modifier.height(2.dp))
-        Text(value, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold, color = valueColor)
+        Text(value, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = valueColor)
     }
 }
 
@@ -2123,7 +1669,7 @@ private fun InteractivePriceChart(
 ) {
     val isDark = isSystemInDarkTheme()
     val primaryColor = MaterialTheme.colorScheme.primary
-    val gridColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+    val gridColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
     val textPaintColor = if (isDark) android.graphics.Color.LTGRAY else android.graphics.Color.DKGRAY
 
     var touchFraction by remember { mutableStateOf<Float?>(null) }
@@ -2138,8 +1684,8 @@ private fun InteractivePriceChart(
         Modifier
             .fillMaxWidth()
             .height(220.dp)
-            .clip(RoundedCornerShape(14.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.25f))
+            .clip(RoundedCornerShape(20.dp))
+            .background(MaterialTheme.colorScheme.surfaceContainer)
             .pointerInput(points) {
                 detectTapGestures(
                     onTap = { offset ->
@@ -2195,7 +1741,6 @@ private fun InteractivePriceChart(
                 isAntiAlias = true
             }
 
-            // 1. Horizontal gridlines & Y-axis labels (max, mid, min)
             val midPrice = (maxPrice + minPrice) / 2.0
             val yLevels = listOf(
                 maxPrice to topPad,
@@ -2214,26 +1759,12 @@ private fun InteractivePriceChart(
                 drawContext.canvas.nativeCanvas.drawText(label, 8.dp.toPx(), yPos + 4.dp.toPx(), paint)
             }
 
-            // 2. X-axis date labels (start, mid, end)
-            val dateFormat = SimpleDateFormat("MMM d", Locale.getDefault())
-            val startDate = dateFormat.format(Date(points.first().at))
-            val midDate = dateFormat.format(Date(points[points.size / 2].at))
-            val endDate = dateFormat.format(Date(points.last().at))
-
-            val yDate = size.height - 8.dp.toPx()
-            drawContext.canvas.nativeCanvas.drawText(startDate, leftPad, yDate, paint)
-            drawContext.canvas.nativeCanvas.drawText(midDate, leftPad + chartW / 2f - 18.dp.toPx(), yDate, paint)
-            val endPaint = android.graphics.Paint(paint).apply { textAlign = android.graphics.Paint.Align.RIGHT }
-            drawContext.canvas.nativeCanvas.drawText(endDate, size.width - rightPad, yDate, endPaint)
-
-            // 3. Compute point coordinates
             val coords = points.mapIndexed { i, p ->
                 val x = leftPad + chartW * i / (points.size - 1)
                 val y = topPad + (chartH * (1.0 - ((p.price - minPrice) / range))).toFloat()
                 Offset(x, y)
             }
 
-            // 4. Gradient filled area under line
             val fillPath = Path().apply {
                 moveTo(coords.first().x, topPad + chartH)
                 coords.forEach { lineTo(it.x, it.y) }
@@ -2243,13 +1774,12 @@ private fun InteractivePriceChart(
             drawPath(
                 path = fillPath,
                 brush = Brush.verticalGradient(
-                    colors = listOf(primaryColor.copy(alpha = 0.32f), primaryColor.copy(alpha = 0.02f)),
+                    colors = listOf(primaryColor.copy(alpha = 0.25f), primaryColor.copy(alpha = 0.01f)),
                     startY = topPad,
                     endY = topPad + chartH,
                 )
             )
 
-            // 5. Line curve
             val linePath = Path().apply {
                 coords.forEachIndexed { i, pt ->
                     if (i == 0) moveTo(pt.x, pt.y) else lineTo(pt.x, pt.y)
@@ -2258,40 +1788,32 @@ private fun InteractivePriceChart(
             drawPath(
                 path = linePath,
                 color = primaryColor,
-                style = Stroke(width = 3.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round),
+                style = Stroke(width = 2.5.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round),
             )
 
-            // 6. Dot on latest price
             val lastPt = coords.last()
-            drawCircle(primaryColor.copy(alpha = 0.25f), radius = 8.dp.toPx(), center = lastPt)
             drawCircle(primaryColor, radius = 4.dp.toPx(), center = lastPt)
 
-            // 7. Lowest price marked in green
             if (lowestIndex in coords.indices) {
                 val lowPt = coords[lowestIndex]
                 drawCircle(greenColor, radius = 5.dp.toPx(), center = lowPt)
-                drawCircle(Color.White, radius = 2.dp.toPx(), center = lowPt)
             }
 
-            // 8. Tooltip on touch / drag
             touchFraction?.let { frac ->
                 val idx = (frac * (coords.size - 1)).roundToInt().coerceIn(0, coords.size - 1)
                 val touchPt = coords[idx]
                 val ptData = points[idx]
 
-                // Vertical dashed indicator line
                 drawLine(
                     color = primaryColor.copy(alpha = 0.6f),
                     start = Offset(touchPt.x, topPad),
                     end = Offset(touchPt.x, topPad + chartH),
-                    strokeWidth = 1.5.dp.toPx(),
+                    strokeWidth = 1.dp.toPx(),
                 )
 
-                // Dot on selected point
                 drawCircle(primaryColor, radius = 6.dp.toPx(), center = touchPt)
                 drawCircle(Color.White, radius = 3.dp.toPx(), center = touchPt)
 
-                // Tooltip card background and text
                 val tipDate = SimpleDateFormat("MMM d, yyyy", Locale.getDefault()).format(Date(ptData.at))
                 val tipPrice = money(ptData.price, currency)
                 val tipText = "$tipPrice · $tipDate"
@@ -2309,7 +1831,7 @@ private fun InteractivePriceChart(
                 val boxY = (touchPt.y - boxH - 10.dp.toPx()).coerceAtLeast(topPad - 6.dp.toPx())
 
                 drawRoundRect(
-                    color = Color(0xFF1E293B),
+                    color = Color(0xFF171716),
                     topLeft = Offset(boxX, boxY),
                     size = androidx.compose.ui.geometry.Size(boxW, boxH),
                     cornerRadius = androidx.compose.ui.geometry.CornerRadius(6.dp.toPx(), 6.dp.toPx()),
@@ -2326,7 +1848,7 @@ private fun InteractivePriceChart(
 }
 
 // -------------------------------------------------------------
-// REUSABLE ASYNC IMAGE WITH HEADERS & PLACEHOLDERS
+// REUSABLE ASYNC IMAGE
 // -------------------------------------------------------------
 @Composable
 fun ProductAsyncImage(
@@ -2339,7 +1861,7 @@ fun ProductAsyncImage(
     val model = remember(imageUrl, pageUrl) {
         ImageRequest.Builder(context)
             .data(imageUrl)
-            .crossfade(true)
+            .crossfade(false)
             .setHeader("User-Agent", Scraper.UA)
             .apply {
                 if (!pageUrl.isNullOrBlank()) {
@@ -2363,16 +1885,16 @@ fun ProductAsyncImage(
 // THEME MENU BUTTON
 // -------------------------------------------------------------
 @Composable
-private fun ThemeMenuButton(vm: MainVm) {
+private fun ThemeMenuButton(vm: MainVm, modifier: Modifier = Modifier) {
     var expanded by remember { mutableStateOf(false) }
     val currentMode by vm.themeMode.collectAsState()
 
-    Box {
+    Box(modifier) {
         IconButton(onClick = { expanded = true }) {
             Icon(
                 painter = painterResource(R.drawable.ic_theme),
                 contentDescription = "Theme mode",
-                modifier = Modifier.size(22.dp),
+                modifier = Modifier.size(16.dp),
             )
         }
         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
@@ -2402,8 +1924,234 @@ private fun ThemeMenuButton(vm: MainVm) {
 }
 
 // -------------------------------------------------------------
-// DIALOGS
+// REDESIGNED ACTION SHEETS & DIALOGS
 // -------------------------------------------------------------
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ProductOptionsBottomSheet(
+    product: Product,
+    onDismiss: () -> Unit,
+    onOpenNote: () -> Unit,
+    onPriceHistory: () -> Unit,
+    onCopyLink: () -> Unit,
+    onChangeCurrencyPrice: () -> Unit,
+    onDelete: () -> Unit,
+) {
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+    ) {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp, vertical = 12.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
+            ) {
+                ProductAsyncImage(
+                    imageUrl = product.imageUrl,
+                    pageUrl = product.url,
+                    modifier = Modifier
+                        .size(56.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(MaterialTheme.colorScheme.surface),
+                )
+                Spacer(Modifier.width(14.dp))
+                Column(Modifier.weight(1f)) {
+                    Text(
+                        product.title,
+                        style = MaterialTheme.typography.titleMedium,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    Spacer(Modifier.height(2.dp))
+                    Text(
+                        product.domain.uppercase(),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+
+            HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f))
+            Spacer(Modifier.height(8.dp))
+
+            ListItem(
+                modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).clickable { onDismiss(); onOpenNote() },
+                leadingContent = { Icon(painterResource(R.drawable.ic_note), null, tint = MaterialTheme.colorScheme.onSurface) },
+                headlineContent = { Text(if (product.note.isNullOrBlank()) "Add note" else "Edit note") },
+            )
+            ListItem(
+                modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).clickable { onDismiss(); onPriceHistory() },
+                leadingContent = { Icon(Icons.Default.DateRange, null, tint = MaterialTheme.colorScheme.onSurface) },
+                headlineContent = { Text("Price history") },
+            )
+            ListItem(
+                modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).clickable { onDismiss(); onCopyLink() },
+                leadingContent = { Icon(Icons.Default.Share, null, tint = MaterialTheme.colorScheme.onSurface) },
+                headlineContent = { Text("Copy link") },
+            )
+            ListItem(
+                modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).clickable { onDismiss(); onChangeCurrencyPrice() },
+                leadingContent = { Icon(Icons.Default.Edit, null, tint = MaterialTheme.colorScheme.onSurface) },
+                headlineContent = { Text("Change currency / edit price") },
+            )
+            ListItem(
+                modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).clickable { onDismiss(); onDelete() },
+                leadingContent = { Icon(Icons.Default.Delete, null, tint = MaterialTheme.colorScheme.error) },
+                headlineContent = { Text("Delete", color = MaterialTheme.colorScheme.error) },
+            )
+            Spacer(Modifier.height(16.dp))
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SortBottomSheet(
+    activeOption: FolderSortOption,
+    onDismiss: () -> Unit,
+    onSelect: (FolderSortOption) -> Unit,
+) {
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+    ) {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp, vertical = 12.dp)
+        ) {
+            Text("SORT PRODUCTS BY", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Spacer(Modifier.height(16.dp))
+
+            FolderSortOption.entries.forEach { option ->
+                val sel = option == activeOption
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(16.dp))
+                        .clickable { onSelect(option); onDismiss() }
+                        .padding(horizontal = 12.dp, vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    RadioButton(
+                        selected = sel,
+                        onClick = null,
+                    )
+                    Spacer(Modifier.width(12.dp))
+                    Text(
+                        option.label,
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = if (sel) FontWeight.Bold else FontWeight.Normal,
+                        color = if (sel) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                    )
+                }
+            }
+            Spacer(Modifier.height(16.dp))
+        }
+    }
+}
+
+@Composable
+private fun VisitProductDialog(
+    product: Product,
+    onDismiss: () -> Unit,
+    onVisit: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        shape = RoundedCornerShape(28.dp),
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+        title = { Text("Visit store?", style = MaterialTheme.typography.titleLarge) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    ProductAsyncImage(
+                        imageUrl = product.imageUrl,
+                        pageUrl = product.url,
+                        modifier = Modifier
+                            .size(48.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(MaterialTheme.colorScheme.surface),
+                    )
+                    Spacer(Modifier.width(12.dp))
+                    Column(Modifier.weight(1f)) {
+                        Text(product.title, style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Text(product.domain.uppercase(), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            PillButton(text = "Visit store", onClick = onVisit, isPrimary = true)
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text("Cancel") }
+        },
+    )
+}
+
+@Composable
+private fun NoteDialog(
+    productTitle: String,
+    initialNote: String,
+    onDismiss: () -> Unit,
+    onSave: (String?) -> Unit,
+    onDeleteNote: (() -> Unit)? = null,
+) {
+    var note by remember { mutableStateOf(initialNote) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        shape = RoundedCornerShape(28.dp),
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+        title = { Text(if (initialNote.isBlank()) "Add note" else "Edit note", style = MaterialTheme.typography.titleLarge) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(productTitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                BasicTextField(
+                    value = note,
+                    onValueChange = { note = it },
+                    textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
+                    minLines = 4,
+                    maxLines = 8,
+                    decorationBox = { innerTextField ->
+                        Box(
+                            modifier = Modifier.fillMaxWidth().padding(bottom = 6.dp),
+                            contentAlignment = Alignment.TopStart,
+                        ) {
+                            if (note.isEmpty()) {
+                                Text("Size, color, reminders…", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f))
+                            }
+                            innerTextField()
+                        }
+                    },
+                )
+                Box(Modifier.fillMaxWidth().height(1.dp).background(MaterialTheme.colorScheme.outline))
+            }
+        },
+        confirmButton = {
+            PillButton(text = "Save", onClick = { onSave(note.trim().ifBlank { null }) }, isPrimary = true)
+        },
+        dismissButton = {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if (initialNote.isNotBlank() && onDeleteNote != null) {
+                    TextButton(onClick = onDeleteNote, colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)) {
+                        Text("Delete note")
+                    }
+                }
+                TextButton(onClick = onDismiss) { Text("Cancel") }
+            }
+        },
+    )
+}
+
 @Composable
 private fun AddProductDialog(
     initialUrl: String,
@@ -2433,92 +2181,87 @@ private fun AddProductDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Add product link") },
+        shape = RoundedCornerShape(28.dp),
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+        title = { Text("Add product link", style = MaterialTheme.typography.titleLarge) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
                     value = url,
                     onValueChange = { url = it },
-                    label = { Text("Product link") },
-                    placeholder = { Text("https://store.com/item...") },
+                    label = { Text("Product URL") },
                     singleLine = true,
+                    shape = RoundedCornerShape(16.dp),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
-                    trailingIcon = {
-                        if (url.isNotEmpty()) {
-                            IconButton(onClick = { url = "" }) {
-                                Icon(Icons.Default.Close, "Clear")
-                            }
-                        }
-                    },
                     modifier = Modifier.fillMaxWidth(),
                 )
             }
         },
         confirmButton = {
-            Button(
-                enabled = isValidUrl,
-                onClick = { if (isValidUrl) onSave(trimmed) }
-            ) {
-                Text("Save")
-            }
+            PillButton(text = "Save link", onClick = { if (isValidUrl) onSave(trimmed) }, enabled = isValidUrl, isPrimary = true)
         },
         dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } },
     )
 }
 
 @Composable
-private fun NoteDialog(
-    productTitle: String,
-    initialNote: String,
+private fun CurrencyWarningDialog(
+    product: Product,
+    defaultCurrency: String,
     onDismiss: () -> Unit,
-    onSave: (String?) -> Unit,
-    onDeleteNote: (() -> Unit)? = null,
+    onSwitchCurrency: () -> Unit,
+    onConvertRate: (Double) -> Unit,
 ) {
-    var note by remember { mutableStateOf(initialNote) }
+    var rateText by remember { mutableStateOf("") }
+    var showConvertInput by remember { mutableStateOf(false) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(painterResource(R.drawable.ic_note), null, Modifier.size(20.dp), tint = MaterialTheme.colorScheme.tertiary)
-                Spacer(Modifier.width(8.dp))
-                Text(if (initialNote.isBlank()) "Add note" else "Edit note")
-            }
-        },
+        shape = RoundedCornerShape(28.dp),
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+        title = { Text("${product.currency ?: "Foreign currency"} detected", style = MaterialTheme.typography.titleLarge) },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Text(
-                    productTitle,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
+                    "This item is listed in ${product.currency ?: "USD"}. You can switch it to $defaultCurrency or convert using an exchange rate.",
+                    style = MaterialTheme.typography.bodyMedium,
                 )
-                OutlinedTextField(
-                    value = note,
-                    onValueChange = { note = it },
-                    label = { Text("Note") },
-                    placeholder = { Text("Size, color, promo code, reminders…") },
-                    minLines = 4,
-                    maxLines = 10,
-                    modifier = Modifier.fillMaxWidth(),
-                )
+
+                if (showConvertInput) {
+                    OutlinedTextField(
+                        value = rateText,
+                        onValueChange = { rateText = it },
+                        label = { Text("Exchange rate") },
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                        shape = RoundedCornerShape(16.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
             }
         },
         confirmButton = {
-            Button(onClick = { onSave(note.trim().ifBlank { null }) }) {
-                Text("Save")
+            if (showConvertInput) {
+                PillButton(
+                    text = "Convert",
+                    onClick = {
+                        val rate = rateText.toDoubleOrNull()
+                        if (rate != null && rate > 0) onConvertRate(rate)
+                    },
+                    isPrimary = true,
+                )
+            } else {
+                PillButton(
+                    text = "Switch to $defaultCurrency",
+                    onClick = onSwitchCurrency,
+                    isPrimary = true,
+                )
             }
         },
         dismissButton = {
             Row {
-                if (initialNote.isNotBlank() && onDeleteNote != null) {
-                    TextButton(
-                        onClick = onDeleteNote,
-                        colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
-                    ) {
-                        Text("Delete note")
-                    }
+                if (!showConvertInput) {
+                    TextButton(onClick = { showConvertInput = true }) { Text("Convert rate") }
                 }
                 TextButton(onClick = onDismiss) { Text("Cancel") }
             }
@@ -2527,38 +2270,88 @@ private fun NoteDialog(
 }
 
 @Composable
+private fun EditPriceAndCurrencyDialog(
+    product: Product,
+    defaultCurrency: String,
+    onDismiss: () -> Unit,
+    onSave: (Double?, String) -> Unit,
+) {
+    var priceText by remember {
+        mutableStateOf(product.price?.let { if (it % 1.0 == 0.0) it.toLong().toString() else it.toString() } ?: "")
+    }
+    var currencyText by remember { mutableStateOf(product.currency ?: defaultCurrency) }
+    val currencies = listOf("INR", "USD", "EUR", "GBP")
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        shape = RoundedCornerShape(28.dp),
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+        title = { Text("Change currency / edit price", style = MaterialTheme.typography.titleLarge) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(product.title, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                OutlinedTextField(
+                    value = priceText,
+                    onValueChange = { priceText = it },
+                    label = { Text("Price amount") },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    shape = RoundedCornerShape(16.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Text("CURRENCY", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    currencies.forEach { cur ->
+                        FilterChip(
+                            selected = currencyText.equals(cur, ignoreCase = true),
+                            onClick = { currencyText = cur },
+                            label = { Text(cur, style = MaterialTheme.typography.bodySmall) },
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            PillButton(
+                text = "Save",
+                onClick = {
+                    val p = Scraper.parsePrice(priceText)
+                    onSave(p, currencyText.uppercase())
+                },
+                isPrimary = true,
+            )
+        },
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } },
+    )
+}
+
+@Composable
 private fun FolderDialog(
     title: String,
     initialName: String,
-    initialEmoji: String,
     initialColor: Long,
     onDismiss: () -> Unit,
-    onSave: (String, String, Long) -> Unit,
+    onSave: (String, Long) -> Unit,
 ) {
     var name by remember { mutableStateOf(initialName) }
-    var emoji by remember { mutableStateOf(initialEmoji) }
     var selectedColor by remember { mutableStateOf(initialColor) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(title) },
+        shape = RoundedCornerShape(28.dp),
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+        title = { Text(title, style = MaterialTheme.typography.titleLarge) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
-                    label = { Text("Name (e.g. Denim)") },
+                    label = { Text("Folder name") },
                     singleLine = true,
+                    shape = RoundedCornerShape(16.dp),
                     modifier = Modifier.fillMaxWidth(),
                 )
-                OutlinedTextField(
-                    value = emoji,
-                    onValueChange = { emoji = it.take(4) },
-                    label = { Text("Emoji") },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                Text("Folder Color", style = MaterialTheme.typography.labelLarge)
+                Text("ACCENT COLOR", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.fillMaxWidth(),
@@ -2580,12 +2373,7 @@ private fun FolderDialog(
                             contentAlignment = Alignment.Center,
                         ) {
                             if (isSelected) {
-                                Icon(
-                                    Icons.Default.Check,
-                                    null,
-                                    tint = Color.White,
-                                    modifier = Modifier.size(18.dp),
-                                )
+                                Icon(Icons.Default.Check, null, tint = Color.White, modifier = Modifier.size(18.dp))
                             }
                         }
                     }
@@ -2593,43 +2381,7 @@ private fun FolderDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = { if (name.isNotBlank()) onSave(name, emoji, selectedColor) }) {
-                Text("Save")
-            }
-        },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } },
-    )
-}
-
-@Composable
-private fun NumberDialog(
-    title: String,
-    initial: Double?,
-    allowClear: Boolean,
-    onDismiss: () -> Unit,
-    onSave: (Double?) -> Unit,
-) {
-    var text by remember {
-        mutableStateOf(initial?.let { if (it % 1.0 == 0.0) it.toLong().toString() else it.toString() } ?: "")
-    }
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(title) },
-        text = {
-            OutlinedTextField(
-                value = text,
-                onValueChange = { text = it },
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                modifier = Modifier.fillMaxWidth(),
-            )
-        },
-        confirmButton = {
-            TextButton(onClick = {
-                val v = Scraper.parsePrice(text)
-                if (v != null || (allowClear && text.isBlank())) onSave(v)
-            }) { Text("Save") }
+            PillButton(text = "Save", onClick = { if (name.isNotBlank()) onSave(name, selectedColor) }, isPrimary = true)
         },
         dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } },
     )
@@ -2646,18 +2398,21 @@ private fun TextEditDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(title) },
+        shape = RoundedCornerShape(28.dp),
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+        title = { Text(title, style = MaterialTheme.typography.titleLarge) },
         text = {
             OutlinedTextField(
                 value = text,
                 onValueChange = { text = it },
-                label = { Text("Product title") },
+                label = { Text("Title") },
                 maxLines = 4,
+                shape = RoundedCornerShape(16.dp),
                 modifier = Modifier.fillMaxWidth(),
             )
         },
         confirmButton = {
-            TextButton(onClick = { onSave(text) }) { Text("Save") }
+            PillButton(text = "Save", onClick = { onSave(text) }, isPrimary = true)
         },
         dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } },
     )

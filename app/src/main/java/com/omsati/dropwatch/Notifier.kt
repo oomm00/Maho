@@ -18,13 +18,14 @@ object Notifier {
     fun ensureChannel(ctx: Context) {
         val nm = ctx.getSystemService(NotificationManager::class.java)
         nm?.createNotificationChannel(
-            NotificationChannel(CHANNEL, "Price drops", NotificationManager.IMPORTANCE_HIGH).apply {
+            NotificationChannel(CHANNEL, "Maho price drops", NotificationManager.IMPORTANCE_HIGH).apply {
                 description = "Alerts when a saved product gets cheaper"
             }
         )
     }
 
     fun priceDrop(ctx: Context, p: Product, old: Double?, hitTarget: Boolean) {
+        ensureChannel(ctx)
         if (Build.VERSION.SDK_INT >= 33 &&
             ctx.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
         ) return
@@ -37,7 +38,7 @@ object Notifier {
             ctx, p.id.toInt(), open, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
         val nowStr = money(p.price, p.currency)
-        val oldStr = if (old != null) money(old, p.currency) else null
+        val oldStr = if (old != null && old > 0) money(old, p.currency) else null
         val pctSaved = if (old != null && old > 0 && p.price != null && p.price < old) {
             val pct = (((old - p.price) / old) * 100).roundToInt()
             " (-$pct%)"
@@ -59,11 +60,14 @@ object Notifier {
             .setAutoCancel(true)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .build()
-        NotificationManagerCompat.from(ctx).notify(p.id.toInt(), n)
+        try {
+            NotificationManagerCompat.from(ctx).notify(p.id.toInt(), n)
+        } catch (e: SecurityException) {
+            // Permission denied at runtime
+        }
     }
 
     fun sendTestNotification(ctx: Context) {
-        ensureChannel(ctx)
         val testProduct = Product(
             id = 999999L,
             url = "https://example.com/demo",

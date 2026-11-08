@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Maho — the wishlist that watches prices</title>
+  <meta name="description" content="Maho saves the stuff you want to buy and yells when it gets cheaper. No ads, no accounts, no tracking. Download the free Android APK.">
+  <meta name="theme-color" content="#F6F3EC">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="canonical" href="https://oomm00.github.io/Maho/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Maho — the wishlist that watches prices">
+  <meta property="og:description" content="Save it. Watch it. Buy it when it drops. A private, on-device price tracker for Android.">
+  <meta property="og:url" content="https://oomm00.github.io/Maho/">
+  <meta property="og:image" content="https://oomm00.github.io/Maho/assets/logo.svg">
+  <meta name="twitter:card" content="summary">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/styles.css">
+  <script>
+    (function () {
+      document.documentElement.classList.add('js');
+      try {
+        var saved = localStorage.getItem('maho-theme');
+        if (saved === 'dark' || saved === 'light') {
+          document.documentElement.dataset.theme = saved;
+        } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          document.documentElement.dataset.theme = 'dark';
+        }
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- Icon sprite -->
+  <svg class="sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12m0 0 4.5-4.5M12 15l-4.5-4.5M4 17.5V19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-1.5"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m0 0-5-5m5 5-5 5"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="m4.5 17 4.5-4.5 3.5 3.5 2.5-2.5 4.5 4.5"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 4v16h16"/><path d="m7 15 4-5 3 3 5-7"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 9a6 6 0 1 0-12 0c0 5-2 6-2 6h16s-2-1-2-6"/><path d="M10 20a2.2 2.2 0 0 0 4 0"/></symbol>
+    <symbol id="i-reorder" viewBox="0 0 24 24"><path d="M4 7h10M4 12h16M4 17h10"/><circle cx="19" cy="7" r="1.4"/><circle cx="19" cy="17" r="1.4"/></symbol>
+    <symbol id="i-currency" viewBox="0 0 24 24"><path d="M20.5 13.5 13 21a2.1 2.1 0 0 1-3 0L3 14V3h11l6.5 6.5a2.8 2.8 0 0 1 0 4Z"/><circle cx="8" cy="8" r="1.6"/></symbol>
+    <symbol id="i-receipt" viewBox="0 0 24 24"><path d="M5 3h14v18l-2.5-1.6L14 21l-2-1.5L10 21l-2.5-1.6L5 21Z"/><path d="M9 8h6M9 12h6M9 16h3"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4.5 6v6c0 4.5 3.2 7.6 7.5 9 4.3-1.4 7.5-4.5 7.5-9V6Z"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5Z"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M15 5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2"/></symbol>
+  </svg>
+
+  <header class="site-header">
+    <div class="wrap nav">
+      <a class="brand" href="#top" aria-label="Maho home">
+        <img src="assets/logo.svg" width="42" height="42" alt="">
+        <span>MAHO<i class="brand__dot" aria-hidden="true"></i></span>
+      </a>
+
+      <nav class="nav__links" aria-label="Primary">
+        <a href="#features">Features</a>
+        <a href="#how">How it works</a>
+        <a href="#download">Download</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+
+      <div class="nav__actions">
+        <button class="theme-toggle" type="button" aria-label="Switch to dark theme" title="Switch theme">
+          <svg class="icon icon--sun"><use href="#i-sun"/></svg>
+          <svg class="icon icon--moon"><use href="#i-moon"/></svg>
+        </button>
+        <a class="btn btn--small btn--primary" href="download/Maho-v1.0.apk" download="Maho-v1.0.apk">
+          <svg class="icon"><use href="#i-download"/></svg>
+          <span>Download<span class="nav__apk"> APK</span></span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="top">
+      <div class="wrap hero__inner">
+        <div class="hero__copy reveal">
+          <p class="eyebrow"><span class="pulse" aria-hidden="true"></span> The wishlist that watches prices</p>
+          <h1>
+            <span>Save it.</span>
+            <span>Watch it.</span>
+            <span class="accent">Buy it when it drops.</span>
+          </h1>
+          <p class="lede">
+            Maho saves the stuff you want to buy and yells when it gets cheaper.
+            No ads, no accounts, no tracking. Your list stays on your phone.
+          </p>
+
+          <div class="cta-row">
+            <a class="btn btn--primary btn--large" href="download/Maho-v1.0.apk" download="Maho-v1.0.apk">
+              <svg class="icon"><use href="#i-download"/></svg>
+              <span class="btn__stack">
+                <span>Download the APK</span>
+                <small>v1.0 &middot; 1.7 MB</small>
+              </span>
+            </a>
+            <a class="btn btn--ghost btn--large" href="https://github.com/oomm00/Maho" target="_blank" rel="noopener">
+              View on GitHub
+              <svg class="icon"><use href="#i-arrow"/></svg>
+            </a>
+          </div>
+
+          <ul class="trust">
+            <li><svg class="icon"><use href="#i-check"/></svg> Android 8.0+</li>
+            <li><svg class="icon"><use href="#i-check"/></svg> Signed release</li>
+            <li><svg class="icon"><use href="#i-check"/></svg> Free &amp; open source</li>
+          </ul>
+        </div>
+
+        <div class="hero__stage reveal">
+          <div class="phone" aria-label="Maho app preview">
+            <div class="phone__screen">
+              <div class="statusbar">
+                <span>9:41</span>
+                <span class="statusbar__icons" aria-hidden="true">
+                  <i class="sig"></i><i class="wifi"></i><i class="batt"></i>
+                </span>
+              </div>
+
+              <div class="appbar">
+                <span class="appbar__brand">MAHO<i aria-hidden="true"></i></span>
+                <span class="appbar__actions" aria-hidden="true">
+                  <span class="chip-icon">&#8635;</span>
+                  <span class="chip-icon">i</span>
+                  <span class="chip-icon">&#9881;</span>
+                </span>
+              </div>
+
+              <div class="appbody">
+                <h2>Your folders</h2>
+                <p class="appbody__sub">4 folders &middot; 18 items</p>
+                <div class="mini-search" aria-hidden="true">Search by title, store, note&hellip;</div>
+
+                <div class="folder-grid">
+                  <article class="mini-folder">
+                    <div class="mini-folder__art" aria-hidden="true">
+                      <span class="tile t1">&#128095;</span>
+                      <span class="tile t2">&#129406;</span>
+                      <span class="tile t3">&#129509;</span>
+                      <span class="tile t4">&#128095;</span>
+                    </div>
+                    <div class="mini-folder__info"><b>Sneakers</b><span>6 items &middot; &#8377;42,900</span></div>
+                  </article>
+
+                  <article class="mini-folder">
+                    <div class="mini-folder__art" aria-hidden="true">
+                      <span class="tile t5">&#128187;</span>
+                      <span class="tile t6">&#9000;</span>
+                      <span class="tile t7">&#128161;</span>
+                      <span class="tile t8">&#9749;</span>
+                    </div>
+                    <div class="mini-folder__info"><b>Desk setup</b><span>5 items &middot; &#8377;58,400</span></div>
+                  </article>
+
+                  <article class="mini-folder">
+                    <div class="mini-folder__art" aria-hidden="true">
+                      <span class="tile t9">&#127873;</span>
+                      <span class="tile t10">&#128142;</span>
+                      <span class="tile t11">&#128133;</span>
+                      <span class="tile t12">&#127873;</span>
+                    </div>
+                    <div class="mini-folder__info"><b>Gift ideas</b><span>4 items &middot; &#8377;12,200</span></div>
+                  </article>
+
+                  <article class="mini-folder">
+                    <div class="mini-folder__art" aria-hidden="true">
+                      <span class="tile t13">&#127911;</span>
+                      <span class="tile t14">&#128241;</span>
+                      <span class="tile t15">&#128267;</span>
+                      <span class="tile t16">&#127911;</span>
+                    </div>
+                    <div class="mini-folder__info"><b>Unsorted</b><span>3 items &middot; &#8377;24,990</span></div>
+                  </article>
+                </div>
+
+                <article class="mini-product">
+                  <div class="mini-product__thumb" aria-hidden="true">&#127911;</div>
+                  <div class="mini-product__body">
+                    <b>Sony WH-1000XM5</b>
+                    <span class="mini-product__price">&#8377;24,990 <s>&#8377;29,990</s></span>
+                    <span class="mini-product__store">AMAZON.IN <i aria-hidden="true"></i></span>
+                  </div>
+                  <span class="mini-product__drop" aria-hidden="true">&darr; 18%</span>
+                </article>
+              </div>
+
+              <div class="phone__fab" aria-hidden="true">&#65291; Add link</div>
+              <div class="phone__home" aria-hidden="true"></div>
+            </div>
+          </div>
+
+          <div class="float-card float-card--drop" aria-hidden="true">
+            <div class="float-card__top">
+              <span class="drop-badge">&darr; 18%</span>
+              <span class="float-card__time">now</span>
+            </div>
+            <b>Price drop</b>
+            <p>Sony WH-1000XM5</p>
+            <div class="float-card__price">&#8377;24,990 <s>&#8377;29,990</s></div>
+          </div>
+
+          <div class="float-card float-card--stat" aria-hidden="true">
+            <span class="stat-dot"></span>
+            <div><b>18 items</b><span>tracked across 4 folders</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee__track">
+        <span>No ads</span><i>&#10022;</i><span>No accounts</span><i>&#10022;</i><span>No tracking</span><i>&#10022;</i><span>Your list stays on your phone</span><i>&#10022;</i>
+        <span>No ads</span><i>&#10022;</i><span>No accounts</span><i>&#10022;</i><span>No tracking</span><i>&#10022;</i><span>Your list stays on your phone</span><i>&#10022;</i>
+      </div>
+    </div>
+
+    <section class="section" id="features">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <p class="eyebrow">What it does</p>
+          <h2>A wishlist with<br><span class="accent">a sixth sense.</span></h2>
+          <p class="section-head__lede">Everything you need to stop paying full price — and nothing you don't.</p>
+        </div>
+
+        <div class="feature-grid">
+          <article class="feature reveal">
+            <span class="feature__icon"><svg class="icon"><use href="#i-image"/></svg></span>
+            <h3>Image-led folders</h3>
+            <p>Your folders look like the things inside them. Maho builds a 2&times;2 photo collage cover from your saved items automatically.</p>
+          </article>
+
+          <article class="feature reveal">
+            <span class="feature__icon"><svg class="icon"><use href="#i-chart"/></svg></span>
+            <h3>Price history</h3>
+            <p>A clean line chart with 1M&ndash;All ranges, lowest/highest/average stats, and touch scrubbing for every point.</p>
+          </article>
+
+          <article class="feature reveal">
+            <span class="feature__icon"><svg class="icon"><use href="#i-bell"/></svg></span>
+            <h3>Background checks</h3>
+            <p>WorkManager quietly re-checks your links every 1&ndash;24 hours and pings you the moment a price falls or hits your target.</p>
+          </article>
+
+          <article class="feature reveal">
+            <span class="feature__icon"><svg class="icon"><use href="#i-reorder"/></svg></span>
+            <h3>Drag to reorder</h3>
+            <p>Make the list yours. Long-press, drag, haptic feedback, done. Seven sort modes when you'd rather let go.</p>
+          </article>
+
+          <article class="feature reveal">
+            <span class="feature__icon"><svg class="icon"><use href="#i-currency"/></svg></span>
+            <h3>Multi-currency</h3>
+            <p>Track prices in &#8377;, $, &euro; or &pound;. Maho flags foreign listings and lets you convert with your own rate.</p>
+          </article>
+
+          <article class="feature reveal">
+            <span class="feature__icon"><svg class="icon"><use href="#i-receipt"/></svg></span>
+            <h3>Bill export</h3>
+            <p>Select items, get a tidy itemized text receipt with per-currency subtotals. Save it to Downloads or share it anywhere.</p>
+          </article>
+        </div>
+
+        <div class="chip-row reveal" aria-label="More features">
+          <span>Notes</span>
+          <span>Share-to-save</span>
+          <span>Search</span>
+          <span>Grid &amp; list view</span>
+          <span>Multi-select</span>
+          <span>Dark mode</span>
+          <span>Offline-first</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--tight" id="how">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <p class="eyebrow">How it works</p>
+          <h2>Three steps.<br>Zero babysitting.</h2>
+        </div>
+
+        <div class="steps">
+          <article class="step reveal">
+            <span class="step__num">01</span>
+            <h3>Share a link</h3>
+            <p>From any browser or shopping app, hit Share &rarr; Maho. Or paste a URL straight into a folder.</p>
+          </article>
+          <article class="step reveal">
+            <span class="step__num">02</span>
+            <h3>Maho reads the page</h3>
+            <p>On-device scraping pulls the title, photo and price. If a store is stubborn, tap SET and add it manually.</p>
+          </article>
+          <article class="step reveal">
+            <span class="step__num">03</span>
+            <h3>Get the drop</h3>
+            <p>When the price falls, a notification tells you. Then you decide whether it's actually a good deal.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="privacy">
+      <div class="wrap privacy__inner">
+        <div class="privacy__copy reveal">
+          <p class="eyebrow eyebrow--light">Private by default</p>
+          <h2>Your list lives<br>on your phone.</h2>
+          <p>No sign-up. No cloud sync. No analytics. Maho keeps everything in a local database and talks only to the stores you add.</p>
+        </div>
+        <div class="privacy__stats reveal">
+          <div><b>0</b><span>accounts</span></div>
+          <div><b>0</b><span>trackers</span></div>
+          <div><b>100%</b><span>on-device</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="download">
+      <div class="wrap">
+        <div class="download-card reveal">
+          <div class="download-card__copy">
+            <p class="eyebrow">Get the app</p>
+            <h2>Take Maho with you.</h2>
+            <p>Direct APK, signed and ready to sideload. One file, no store account required.</p>
+
+            <div class="cta-row">
+              <a class="btn btn--primary btn--large" href="download/Maho-v1.0.apk" download="Maho-v1.0.apk">
+                <svg class="icon"><use href="#i-download"/></svg>
+                <span class="btn__stack">
+                  <span>Download Maho</span>
+                  <small>Android 8.0+ &middot; 1.7 MB</small>
+                </span>
+              </a>
+              <a class="btn btn--ghost btn--large" href="https://github.com/oomm00/Maho" target="_blank" rel="noopener">
+                Source code
+                <svg class="icon"><use href="#i-arrow"/></svg>
+              </a>
+            </div>
+
+            <dl class="download-meta">
+              <div><dt>Version</dt><dd>1.0</dd></div>
+              <div><dt>Size</dt><dd>1.7 MB</dd></div>
+              <div><dt>Requires</dt><dd>Android 8.0+</dd></div>
+              <div><dt>Updated</dt><dd>Nov 2026</dd></div>
+            </dl>
+
+            <details class="sha">
+              <summary>SHA-256 checksum</summary>
+              <div class="sha__row">
+                <code id="sha-text">f9694d80500e32948cf06a12b8a3cb9436efb46ec6c2e679a6b8368082bb0cc0</code>
+                <button class="copy-btn" type="button" data-copy="f9694d80500e32948cf06a12b8a3cb9436efb46ec6c2e679a6b8368082bb0cc0" aria-label="Copy SHA-256 checksum">
+                  <svg class="icon"><use href="#i-copy"/></svg>
+                  <span>Copy</span>
+                </button>
+              </div>
+            </details>
+          </div>
+
+          <div class="download-card__art" aria-hidden="true">
+            <div class="orbit orbit--one"></div>
+            <div class="orbit orbit--two"></div>
+            <img src="assets/logo.svg" width="148" height="148" alt="">
+            <span class="apk-tag">.apk</span>
+          </div>
+        </div>
+
+        <div class="install-tip reveal">
+          <span class="install-tip__icon"><svg class="icon"><use href="#i-shield"/></svg></span>
+          <div>
+            <b>Installing a sideloaded APK</b>
+            <p>Download the file, tap it, and allow installs from your browser or file manager when Android asks. Maho needs internet access to read prices and notification permission to ping you. No accounts, no location, no contacts.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--tight" id="faq">
+      <div class="wrap wrap--narrow">
+        <div class="section-head reveal">
+          <p class="eyebrow">Questions</p>
+          <h2>Good to know.</h2>
+        </div>
+
+        <div class="faq reveal">
+          <details>
+            <summary>Is Maho on the Play Store?</summary>
+            <p>Not yet. Maho is distributed as a direct APK for now. The file on this page is a signed release build, so Android will install it after you allow installs from your browser or file manager.</p>
+          </details>
+          <details>
+            <summary>Do I need an account?</summary>
+            <p>No. There is no login, no cloud sync and no server owned by Maho. Your folders, items and price history live in a local Room database on your device.</p>
+          </details>
+          <details>
+            <summary>How does it find prices?</summary>
+            <p>Maho fetches the product page on your phone and reads structured data, meta tags and store-specific markup. Some stores block bots or render prices with JavaScript; for those, Maho falls back to a hidden WebView, and you can always set a price manually.</p>
+          </details>
+          <details>
+            <summary>Why does it need internet access?</summary>
+            <p>Only to load the pages and product images you save, and to check prices in the background. Nothing is sent to us — there is no &ldquo;us&rdquo; server to send it to.</p>
+          </details>
+          <details>
+            <summary>How often are prices checked?</summary>
+            <p>Every 6 hours by default. You can choose 1, 3, 6, 12 or 24 hours in Settings, or run a check immediately.</p>
+          </details>
+          <details>
+            <summary>What happens if I uninstall the app?</summary>
+            <p>Android removes the app's local database along with it. Maho has no cloud backup, so export anything you want to keep first. Bill export is a good way to snapshot a folder.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer__inner">
+      <div class="footer__brand">
+        <a class="brand" href="#top" aria-label="Maho home">
+          <img src="assets/logo.svg" width="38" height="38" alt="">
+          <span>MAHO<i class="brand__dot" aria-hidden="true"></i></span>
+        </a>
+        <p>Built by a creature, not a company.</p>
+      </div>
+
+      <nav class="footer__links" aria-label="Footer">
+        <a href="download/Maho-v1.0.apk" download="Maho-v1.0.apk">Download APK</a>
+        <a href="https://github.com/oomm00/Maho" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://github.com/oomm00/Maho/issues" target="_blank" rel="noopener">Report an issue</a>
+        <a href="https://github.com/oomm00/Maho/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>
+      </nav>
+
+      <div class="footer__social">
+        <a href="https://instagram.com/omsneakycow" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://x.com/Omsneakycow" target="_blank" rel="noopener">X</a>
+      </div>
+    </div>
+    <div class="wrap footer__bottom">
+      <span>&copy; <span id="year">2026</span> Maho</span>
+      <span>Made for people who wait for sales.</span>
+    </div>
+  </footer>
+
+  <script src="assets/app.js"></script>
+</body>
+</html>

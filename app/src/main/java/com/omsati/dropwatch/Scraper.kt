@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.webkit.CookieManager
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import kotlinx.coroutines.Dispatchers
@@ -36,7 +37,8 @@ object Scraper {
 
     private val client = OkHttpClient.Builder()
         .connectTimeout(15, TimeUnit.SECONDS)
-        .readTimeout(20, TimeUnit.SECONDS)
+        .readTimeout(15, TimeUnit.SECONDS)
+        .callTimeout(30, TimeUnit.SECONDS)
         .followRedirects(true)
         .followSslRedirects(true)
         .build()
@@ -44,8 +46,14 @@ object Scraper {
     const val UA = "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 " +
         "(KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36"
 
+    private const val MAX_RESPONSE_SIZE = 2 * 1024 * 1024L // 2 MB cap
+
     suspend fun fetch(ctx: Context, url: String): Result = withContext(Dispatchers.IO) {
-        Log.d("Scraper", "Fetching initial URL: $url")
+        if (!url.startsWith("http://", ignoreCase = true) && !url.startsWith("https://", ignoreCase = true)) {
+            return@withContext Result(title = null, imageUrl = null, price = null, currency = null, finalUrl = url)
+        }
+
+        if (BuildConfig.DEBUG) Log.d("Scraper", "Fetching initial URL: $url")
         var finalUrl = url
         var body: String? = null
 
@@ -54,39 +62,63 @@ object Scraper {
                 .url(url)
                 .header("User-Agent", UA)
                 .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8")
-                .header("Accept-Language", "en-US,en;q=0.9,hi;q=0.8")
+                .header("Accept-Language", "en-IN,en;q=0.9,hi;q=0.8")
+                .header("Cookie", "cart_currency=INR; localization=IN; country=IN")
                 .build()
             client.newCall(req).execute().use { resp ->
                 finalUrl = resp.request.url.toString()
-                Log.d("Scraper", "OkHttp followed redirects to final URL: $finalUrl (HTTP ${resp.code})")
+                if (BuildConfig.DEBUG) Log.d("Scraper", "OkHttp followed redirects to final URL: $finalUrl (HTTP ${resp.code})")
                 if (resp.isSuccessful) {
-                    body = resp.body?.string()
-                } else {
-                    Log.d("Scraper", "OkHttp returned non-successful code: ${resp.code} for $finalUrl")
+                    val stream = resp.body?.byteStream()
+                    if (stream != null) {
+                        val buffer = ByteArray(8192)
+                        var totalRead = 0L
+                        val baos = java.io.ByteArrayOutputStream()
+                        var bytesRead: Int
+                        while (stream.read(buffer).also { bytesRead = it } != -1) {
+                            totalRead += bytesRead
+                            if (totalRead > MAX_RESPONSE_SIZE) break
+                            baos.write(buffer, 0, bytesRead)
+                        }
+                        body = baos.toString(Charsets.UTF_8.name())
+                    }
                 }
             }
         } catch (e: Exception) {
-            Log.e("Scraper", "OkHttp fetch error for $url: ${e.message}", e)
+            if (BuildConfig.DEBUG) Log.e("Scraper", "OkHttp fetch error for $url: ${e.message}", e)
         }
 
         var result: Result? = null
         if (!body.isNullOrBlank()) {
-            result = parse(body!!, finalUrl)
-            Log.d("Scraper", "Jsoup parse result for $finalUrl -> price=${result.price}, image=${result.imageUrl}, title=${result.title}")
+            result = runCatching { parse(body!!, finalUrl) }.getOrNull()
         }
 
-        // If no price OR no image, fall back to hidden WebView
+        // Shopify store check & API fetch
+        var shopifyRes: Result? = null
+        if (finalUrl.contains("/products/", ignoreCase = true) || (body != null && body!!.contains("Shopify", ignoreCase = true))) {
+            shopifyRes = runCatching { fetchShopifyApi(finalUrl) }.getOrNull()
+        }
+
+        if (shopifyRes != null) {
+            result = Result(
+                title = result?.title ?: shopifyRes.title,
+                imageUrl = result?.imageUrl ?: shopifyRes.imageUrl,
+                price = shopifyRes.price ?: result?.price,
+                currency = result?.currency ?: shopifyRes.currency,
+                finalUrl = finalUrl,
+            )
+        }
+
+        // Fallback to WebView if price or image missing
         if (result == null || result.price == null || result.imageUrl == null) {
-            Log.d("Scraper", "Price or image missing (price=${result?.price}, image=${result?.imageUrl}). Launching hidden WebView fallback for $finalUrl")
             val webViewResult = withContext(Dispatchers.Main) {
-                runWebView(ctx, finalUrl)
+                runCatching { runWebView(ctx.applicationContext, finalUrl) }.getOrNull()
             }
             if (webViewResult != null) {
                 val mergedPrice = result?.price ?: webViewResult.price
                 val mergedCurrency = result?.currency ?: webViewResult.currency
                 val mergedImage = result?.imageUrl ?: webViewResult.imageUrl
                 val mergedTitle = result?.title ?: webViewResult.title
-                Log.d("Scraper", "Merged result after WebView fallback: price=$mergedPrice, currency=$mergedCurrency, image=$mergedImage, title=$mergedTitle")
                 result = Result(
                     title = mergedTitle,
                     imageUrl = sanitizeImageUrl(mergedImage, finalUrl),
@@ -97,9 +129,54 @@ object Scraper {
             }
         }
 
-        val finalRes = result ?: Result(title = null, imageUrl = null, price = null, currency = null, finalUrl = finalUrl)
-        Log.d("Scraper", "Finished scrape for $url -> FinalResult: price=${finalRes.price}, currency=${finalRes.currency}, image=${finalRes.imageUrl}, title=${finalRes.title}, finalUrl=${finalRes.finalUrl}")
-        finalRes
+        result ?: Result(title = null, imageUrl = null, price = null, currency = null, finalUrl = finalUrl)
+    }
+
+    private fun fetchShopifyApi(url: String): Result? {
+        return try {
+            val uri = URI(url)
+            val host = uri.host ?: return null
+            val path = uri.path ?: return null
+            if (!path.contains("/products/")) return null
+            val handle = path.substringAfter("/products/").substringBefore("/").substringBefore("?").substringBefore("#").trim()
+            if (handle.isBlank()) return null
+
+            val jsonUrl = "https://$host/products/$handle.json"
+            val req = Request.Builder()
+                .url(jsonUrl)
+                .header("User-Agent", UA)
+                .header("Accept", "application/json")
+                .header("Accept-Language", "en-IN,en;q=0.9")
+                .header("Cookie", "cart_currency=INR; localization=IN; country=IN")
+                .build()
+            client.newCall(req).execute().use { resp ->
+                if (resp.isSuccessful) {
+                    val jsonStr = resp.body?.string()
+                    if (!jsonStr.isNullOrBlank()) {
+                        val root = JSONObject(jsonStr)
+                        val prod = root.optJSONObject("product")
+                        if (prod != null) {
+                            val title = prod.optString("title").ifBlank { null }
+                            val variants = prod.optJSONArray("variants")
+                            var price: Double? = null
+                            if (variants != null && variants.length() > 0) {
+                                val v0 = variants.optJSONObject(0)
+                                price = parsePrice(v0?.opt("price"))
+                            }
+                            val images = prod.optJSONArray("images")
+                            var img: String? = null
+                            if (images != null && images.length() > 0) {
+                                img = images.optJSONObject(0)?.optString("src")
+                            }
+                            return Result(title = title, imageUrl = img, price = price, currency = null, finalUrl = url)
+                        }
+                    }
+                }
+            }
+            null
+        } catch (e: Exception) {
+            null
+        }
     }
 
     fun parse(html: String, baseUrl: String): Result {
@@ -120,7 +197,6 @@ object Scraper {
                     offerPrice(node.opt("offers"))?.let {
                         price = it.first
                         currency = it.second
-                        Log.d("Scraper", "JSON-LD strategy found price=$price, currency=$currency")
                     }
                 }
             }
@@ -137,18 +213,15 @@ object Scraper {
 
         if (title == null) {
             title = meta("og:title", "twitter:title") ?: doc.title().ifBlank { null }
-            if (title != null) Log.d("Scraper", "Meta tags/title strategy found title: $title")
         }
         if (image == null) {
             image = meta("og:image", "twitter:image")
-            if (image != null) Log.d("Scraper", "Meta tags strategy found image: $image")
         }
         if (price == null) {
             val metaPrice = parsePrice(meta("product:price:amount", "og:price:amount", "price"))
             if (metaPrice != null) {
                 price = metaPrice
                 currency = meta("product:price:currency", "og:price:currency", "priceCurrency")
-                Log.d("Scraper", "Meta tags strategy found price=$price, currency=$currency")
             }
         }
 
@@ -160,13 +233,11 @@ object Scraper {
                 price = itemPrice
                 val curEl = doc.selectFirst("[itemprop=priceCurrency]")
                 currency = curEl?.attr("content")?.ifBlank { null } ?: curEl?.text()?.ifBlank { null }
-                Log.d("Scraper", "Itemprop strategy found price=$price, currency=$currency")
             }
         }
 
         // 4. Store-specific selectors (Amazon, Flipkart, Myntra, Ajio)
         if (price == null || image == null) {
-            // Amazon
             if (baseUrl.contains("amazon.", ignoreCase = true)) {
                 if (price == null) {
                     val amzPriceEl = doc.selectFirst(
@@ -177,7 +248,6 @@ object Scraper {
                     if (p != null) {
                         price = p
                         currency = "INR"
-                        Log.d("Scraper", "Amazon selector strategy found price=$price")
                     }
                 }
                 if (image == null) {
@@ -186,12 +256,10 @@ object Scraper {
                         ?: imgEl?.attr("src")?.ifBlank { null }
                     if (src != null) {
                         image = src
-                        Log.d("Scraper", "Amazon selector strategy found image=$image")
                     }
                 }
             }
 
-            // Flipkart
             if (baseUrl.contains("flipkart.com", ignoreCase = true)) {
                 if (price == null) {
                     val fkPriceEl = doc.selectFirst("div._30jeq3, div.Nx9bqj, div._16Jk6d, div.hl05eU div")
@@ -199,7 +267,6 @@ object Scraper {
                     if (p != null) {
                         price = p
                         currency = "INR"
-                        Log.d("Scraper", "Flipkart selector strategy found price=$price")
                     }
                 }
                 if (image == null) {
@@ -207,12 +274,10 @@ object Scraper {
                     val src = fkImgEl?.attr("src")?.ifBlank { null }
                     if (src != null) {
                         image = src
-                        Log.d("Scraper", "Flipkart selector strategy found image=$image")
                     }
                 }
             }
 
-            // Myntra & Ajio
             if (baseUrl.contains("myntra.com", ignoreCase = true) || baseUrl.contains("ajio.com", ignoreCase = true)) {
                 if (price == null) {
                     val pEl = doc.selectFirst("span.pdp-price strong, div.pdp-price, span.prod-sp")
@@ -220,13 +285,12 @@ object Scraper {
                     if (p != null) {
                         price = p
                         currency = "INR"
-                        Log.d("Scraper", "Myntra/Ajio selector strategy found price=$price")
                     }
                 }
             }
         }
 
-        // 5. Inline JSON (__NEXT_DATA__, window.__myx, pdpData, etc.)
+        // 5. Inline JSON
         if (price == null || image == null) {
             for (script in doc.select("script")) {
                 val data = script.data()
@@ -235,11 +299,9 @@ object Scraper {
                     if (price == null && found.first != null) {
                         price = found.first
                         currency = found.second ?: "INR"
-                        Log.d("Scraper", "Inline JSON strategy found price=$price")
                     }
                     if (image == null && found.third != null) {
                         image = found.third
-                        Log.d("Scraper", "Inline JSON strategy found image=$image")
                     }
                     if (price != null && image != null) break
                 }
@@ -256,7 +318,6 @@ object Scraper {
                 if (p != null) {
                     price = p
                     currency = "INR"
-                    Log.d("Scraper", "Regex Rupee strategy found price=$price")
                 }
             }
         }
@@ -269,7 +330,7 @@ object Scraper {
         return Result(title?.trim(), image, price, currency?.trim()?.ifBlank { null }, baseUrl)
     }
 
-    private suspend fun runWebView(ctx: Context, url: String): Result? = withTimeoutOrNull(20_000L) {
+    private suspend fun runWebView(appCtx: Context, url: String): Result? = withTimeoutOrNull(20_000L) {
         suspendCancellableCoroutine { cont ->
             var webView: WebView? = null
             val cleanup = {
@@ -282,7 +343,7 @@ object Scraper {
                     }
                     webView = null
                 } catch (e: Exception) {
-                    Log.e("Scraper", "WebView cleanup error: ${e.message}")
+                    if (BuildConfig.DEBUG) Log.e("Scraper", "WebView cleanup error: ${e.message}")
                 }
             }
 
@@ -291,7 +352,11 @@ object Scraper {
             }
 
             try {
-                val wv = WebView(ctx.applicationContext)
+                val cookieManager = CookieManager.getInstance()
+                cookieManager.setAcceptCookie(true)
+                cookieManager.setCookie(url, "cart_currency=INR; localization=IN; country=IN")
+
+                val wv = WebView(appCtx)
                 webView = wv
                 wv.settings.apply {
                     javaScriptEnabled = true
@@ -342,23 +407,21 @@ object Scraper {
                         """.trimIndent()
 
                         wv.evaluateJavascript(js) { rawResult ->
-                            cleanup()
-                            if (rawResult.isNullOrBlank() || rawResult == "null") {
-                                Log.d("Scraper", "WebView evaluateJavascript returned null/blank")
-                                cont.resume(null)
-                            } else {
-                                try {
+                            try {
+                                if (rawResult.isNullOrBlank() || rawResult == "null") {
+                                    cont.resume(null)
+                                } else {
                                     val unquoted = if (rawResult.startsWith("\"") && rawResult.endsWith("\"")) {
                                         JSONTokener(rawResult).nextValue().toString()
                                     } else rawResult
                                     val json = JSONObject(unquoted)
                                     val parsed = parseWebViewJson(json, url)
-                                    Log.d("Scraper", "WebView evaluated result -> price=${parsed.price}, image=${parsed.imageUrl}, title=${parsed.title}")
                                     cont.resume(parsed)
-                                } catch (e: Exception) {
-                                    Log.e("Scraper", "Error parsing webview result: ${e.message}", e)
-                                    cont.resume(null)
                                 }
+                            } catch (e: Exception) {
+                                cont.resume(null)
+                            } finally {
+                                cleanup()
                             }
                         }
                     }
@@ -367,21 +430,18 @@ object Scraper {
                 wv.webViewClient = object : WebViewClient() {
                     override fun onPageFinished(view: WebView?, finishedUrl: String?) {
                         super.onPageFinished(view, finishedUrl)
-                        Log.d("Scraper", "WebView onPageFinished for $finishedUrl, waiting 3s for JS hydration")
                         Handler(Looper.getMainLooper()).postDelayed({
                             evaluateScript()
                         }, 3000L)
                     }
 
                     override fun onReceivedError(view: WebView?, errorCode: Int, description: String?, failingUrl: String?) {
-                        Log.d("Scraper", "WebView error: $description on $failingUrl")
+                        // ignore error
                     }
                 }
 
-                Log.d("Scraper", "Loading URL in WebView: $url")
                 wv.loadUrl(url)
             } catch (e: Exception) {
-                Log.e("Scraper", "WebView initialization failed: ${e.message}", e)
                 cleanup()
                 cont.resume(null)
             }
@@ -394,7 +454,6 @@ object Scraper {
         var price: Double? = parsePrice(json.optString("amazonPrice").ifBlank { null })
         var currency: String? = if (price != null) "INR" else null
 
-        // Metas
         val metas = json.optJSONObject("metas")
         if (metas != null) {
             if (title == null) {
@@ -417,7 +476,6 @@ object Scraper {
             }
         }
 
-        // LD-JSON scripts
         val ldArray = json.optJSONArray("ldJson")
         if (ldArray != null) {
             for (i in 0 until ldArray.length()) {
@@ -437,7 +495,6 @@ object Scraper {
             }
         }
 
-        // Itemprop prices
         if (price == null) {
             val ipArray = json.optJSONArray("itempropPrices")
             if (ipArray != null) {
@@ -451,7 +508,6 @@ object Scraper {
             }
         }
 
-        // Fallback to outerHTML if still missing
         val html = json.optString("html")
         if ((price == null || image == null) && html.isNotBlank()) {
             val parsedHtml = parse(html, baseUrl)
@@ -490,7 +546,6 @@ object Scraper {
         var currency: String? = null
         var image: String? = null
 
-        // Try extracting JSON blocks
         val start = text.indexOf('{')
         val end = text.lastIndexOf('}')
         if (start in 0 until end) {

@@ -2,6 +2,7 @@ package com.omsati.dropwatch
 
 import android.app.Application
 import android.content.Context
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.*
@@ -39,6 +40,7 @@ enum class FolderSortOption(val id: String, val label: String) {
     }
 }
 
+@Immutable
 data class FolderSummary(
     val id: Long?, // null for virtual Unsorted folder
     val name: String,
@@ -55,6 +57,17 @@ class MainVm(app: Application) : AndroidViewModel(app) {
     val repo = Repo(app)
     val dao = repo.dao
     private val prefs = app.getSharedPreferences("dropwatch_prefs", Context.MODE_PRIVATE)
+
+    // Default Currency Setting
+    private val _defaultCurrency = MutableStateFlow(prefs.getString("default_currency", "INR") ?: "INR")
+    val defaultCurrency: StateFlow<String> = _defaultCurrency.asStateFlow()
+
+    fun setDefaultCurrency(cur: String) {
+        val uppercaseCur = cur.uppercase()
+        prefs.edit().putString("default_currency", uppercaseCur).apply()
+        _defaultCurrency.value = uppercaseCur
+        messages.tryEmit("Default currency set to $uppercaseCur")
+    }
 
     // Theme Mode
     private val _themeMode = MutableStateFlow(loadThemeMode())
@@ -77,12 +90,12 @@ class MainVm(app: Application) : AndroidViewModel(app) {
     fun setCheckInterval(hours: Int) {
         prefs.edit().putInt("check_interval_hours", hours).apply()
         _checkIntervalHours.value = hours
-        DropWatchApp.schedulePeriodicCheck(getApplication(), update = true)
+        MahoApp.schedulePeriodicCheck(getApplication(), update = true)
         messages.tryEmit("Check interval set to ${hours}h")
     }
 
     fun checkAllPricesNow() {
-        DropWatchApp.runCheckNow(getApplication())
+        MahoApp.runCheckNow(getApplication())
         refreshAll()
     }
 
@@ -99,15 +112,14 @@ class MainVm(app: Application) : AndroidViewModel(app) {
         prefs.getString("sort_option_unsorted", FolderSortOption.MY_ORDER.id) ?: FolderSortOption.MY_ORDER.id
     )
 
-    val folderSummaries = combine(folders, all, _unsortedSortOption) { folderList, productList, unsortedSort ->
+    val folderSummaries = combine(folders, all, _unsortedSortOption, _defaultCurrency) { folderList, productList, unsortedSort, defCur ->
         val list = mutableListOf<FolderSummary>()
-        // Regular folders
         for (f in folderList) {
             val prods = productList.filter { it.folderId == f.id }
             val validPrices = prods.filter { it.price != null && it.price > 0 }
-            val totals = validPrices.groupBy { it.currency?.uppercase() ?: "INR" }
+            val totals = validPrices.groupBy { it.currency?.uppercase() ?: defCur }
                 .mapValues { entry -> entry.value.sumOf { it.price ?: 0.0 } }
-            val totalStr = if (totals.isEmpty()) "₹0"
+            val totalStr = if (totals.isEmpty()) money(0.0, defCur)
             else totals.entries.joinToString(" · ") { (cur, sum) -> money(sum, cur) }
 
             list.add(
@@ -124,12 +136,11 @@ class MainVm(app: Application) : AndroidViewModel(app) {
                 )
             )
         }
-        // Virtual Unsorted folder (products with folderId == null)
         val unsortedProds = productList.filter { it.folderId == null }
         val validUnsorted = unsortedProds.filter { it.price != null && it.price > 0 }
-        val unsortedTotals = validUnsorted.groupBy { it.currency?.uppercase() ?: "INR" }
+        val unsortedTotals = validUnsorted.groupBy { it.currency?.uppercase() ?: defCur }
             .mapValues { entry -> entry.value.sumOf { it.price ?: 0.0 } }
-        val unsortedTotalStr = if (unsortedTotals.isEmpty()) "₹0"
+        val unsortedTotalStr = if (unsortedTotals.isEmpty()) money(0.0, defCur)
         else unsortedTotals.entries.joinToString(" · ") { (cur, sum) -> money(sum, cur) }
 
         list.add(
@@ -137,7 +148,7 @@ class MainVm(app: Application) : AndroidViewModel(app) {
                 id = null,
                 name = "Unsorted",
                 emoji = "📦",
-                color = 0xFF64748BL, // Slate gray for Unsorted
+                color = 0xFF64748BL,
                 sortOption = unsortedSort,
                 count = unsortedProds.size,
                 totalValue = unsortedTotalStr,
@@ -205,6 +216,25 @@ class MainVm(app: Application) : AndroidViewModel(app) {
     fun update(p: Product) = viewModelScope.launch { dao.update(p) }
     fun updateTitle(p: Product, title: String) = viewModelScope.launch { repo.updateTitle(p, title) }
     fun setManualPrice(p: Product, price: Double) = viewModelScope.launch { repo.setManualPrice(p, price) }
+
+    fun updatePriceAndCurrency(p: Product, newPrice: Double?, newCurrency: String?) = viewModelScope.launch {
+        repo.updatePriceAndCurrency(p, newPrice, newCurrency, lockCurrency = true)
+        messages.tryEmit("Price updated")
+    }
+
+    fun switchProductCurrency(p: Product, newCurrency: String) = viewModelScope.launch {
+        dao.update(p.copy(currency = newCurrency.uppercase(), currencyLocked = true))
+        messages.tryEmit("Currency changed to ${newCurrency.uppercase()}")
+    }
+
+    fun convertProductCurrency(p: Product, targetCurrency: String, rate: Double) = viewModelScope.launch {
+        if (p.price != null && rate > 0) {
+            val newPrice = kotlin.math.round(p.price * rate * 100) / 100.0
+            repo.updatePriceAndCurrency(p, newPrice, targetCurrency.uppercase(), lockCurrency = true)
+            messages.tryEmit("Converted price to ${money(newPrice, targetCurrency)}")
+        }
+    }
+
     fun delete(id: Long) = viewModelScope.launch { repo.delete(id); messages.tryEmit("Removed") }
 
     fun deleteMultiple(ids: Collection<Long>) = viewModelScope.launch {

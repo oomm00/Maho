@@ -1,11 +1,13 @@
 package com.omsati.dropwatch
 
 import android.content.Context
+import androidx.compose.runtime.Immutable
 import androidx.room.*
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import kotlinx.coroutines.flow.Flow
 
+@Immutable
 @Entity(tableName = "folders")
 data class Folder(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
@@ -15,6 +17,7 @@ data class Folder(
     val sortOption: String = "MY_ORDER",
 )
 
+@Immutable
 @Entity(tableName = "products")
 data class Product(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
@@ -25,6 +28,7 @@ data class Product(
     val price: Double? = null,
     val previousPrice: Double? = null,
     val currency: String? = null,
+    val currencyLocked: Boolean = false,
     val targetPrice: Double? = null,
     val folderId: Long? = null,
     val category: String = "Other",
@@ -36,6 +40,7 @@ data class Product(
     val note: String? = null,
 )
 
+@Immutable
 @Entity(tableName = "price_history")
 data class PricePoint(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
@@ -79,7 +84,7 @@ interface StoreDao {
     @Query("DELETE FROM price_history WHERE productId IN (:ids)") suspend fun deleteHistoryForProducts(ids: List<Long>)
 }
 
-@Database(entities = [Folder::class, Product::class, PricePoint::class], version = 3, exportSchema = false)
+@Database(entities = [Folder::class, Product::class, PricePoint::class], version = 4, exportSchema = true)
 abstract class AppDb : RoomDatabase() {
     abstract fun dao(): StoreDao
 
@@ -96,7 +101,6 @@ abstract class AppDb : RoomDatabase() {
                 db.execSQL("ALTER TABLE products ADD COLUMN position INTEGER NOT NULL DEFAULT 0")
                 db.execSQL("ALTER TABLE products ADD COLUMN note TEXT")
 
-                // For existing products, set position by their current date-added order, per folder
                 val cursor = db.query("SELECT id, folderId FROM products ORDER BY addedAt ASC")
                 val folderCounts = mutableMapOf<Long?, Int>()
                 val updates = mutableListOf<Pair<Long, Int>>()
@@ -115,10 +119,16 @@ abstract class AppDb : RoomDatabase() {
             }
         }
 
+        val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE products ADD COLUMN currencyLocked INTEGER NOT NULL DEFAULT 0")
+            }
+        }
+
         @Volatile private var inst: AppDb? = null
         fun get(ctx: Context): AppDb = inst ?: synchronized(this) {
             inst ?: Room.databaseBuilder(ctx.applicationContext, AppDb::class.java, "dropwatch.db")
-                .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
                 .build().also { inst = it }
         }
     }
